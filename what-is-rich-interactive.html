@@ -1,0 +1,2083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is Rich?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold: #d4af37;
+            --gold-bright: #ffd700;
+            --gold-dim: #8b7355;
+            --black: #000000;
+            --near-black: #0a0a0a;
+            --white: #ffffff;
+            --off-white: #f8f6f0;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--black);
+            color: var(--white);
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+
+        body.scrollable {
+            overflow-y: auto;
+        }
+
+        /* WebGL Canvas */
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Screen Container */
+        .screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .screen.exit {
+            animation: screenExit 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes screenExit {
+            0% { opacity: 1; transform: scale(1); filter: blur(0); }
+            100% { opacity: 0; transform: scale(1.1); filter: blur(20px); }
+        }
+
+        /* ==========================================
+           SCREEN 0: INTRO / HOOK
+        ========================================== */
+        .screen-intro {
+            background: var(--black);
+            cursor: pointer;
+        }
+
+        .intro-content {
+            text-align: center;
+        }
+
+        .intro-question {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(4rem, 15vw, 12rem);
+            font-weight: 300;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+            opacity: 0;
+            transform: translateY(100px);
+        }
+
+        .intro-question .word {
+            display: inline-block;
+            overflow: hidden;
+        }
+
+        .intro-question .char {
+            display: inline-block;
+            transform: translateY(100%);
+            animation: charReveal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes charReveal {
+            to { transform: translateY(0); }
+        }
+
+        .intro-question .highlight {
+            color: var(--gold);
+            position: relative;
+        }
+
+        .intro-tap {
+            position: absolute;
+            bottom: 10vh;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .intro-line {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 1px;
+            height: 0;
+            background: linear-gradient(to top, var(--gold), transparent);
+            animation: lineGrow 1.5s ease-out 2s forwards;
+        }
+
+        @keyframes lineGrow {
+            to { height: 8vh; }
+        }
+
+        /* ==========================================
+           SCREEN 1: THE INPUT
+        ========================================== */
+        .screen-input {
+            background: transparent;
+            overflow-y: auto;
+            align-items: flex-start;
+            padding-top: 5vh;
+            padding-bottom: 5vh;
+        }
+
+        .input-wrapper {
+            width: 100%;
+            max-width: 800px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 15;
+            margin: auto;
+        }
+
+        .input-prompt {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 300;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease 0.3s;
+            pointer-events: none;
+        }
+
+        .screen-input.active .input-prompt {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .input-prompt span {
+            color: var(--gold);
+        }
+
+        .the-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding: 1.5rem 0;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 400;
+            color: var(--white);
+            text-align: center;
+            outline: none;
+            caret-color: var(--gold);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease 0.5s;
+            position: relative;
+            z-index: 5;
+        }
+
+        .screen-input.active .the-input {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .the-input::placeholder {
+            color: rgba(255,255,255,0.2);
+        }
+
+        .the-input:focus {
+            border-bottom-color: var(--gold);
+        }
+
+        .input-hint {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 0.1em;
+            opacity: 0;
+            transition: opacity 0.5s ease 1s;
+            pointer-events: none;
+        }
+
+        .screen-input.active .input-hint {
+            opacity: 1;
+        }
+
+        /* Suggestion Chips */
+        .suggestions-label {
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+            opacity: 0;
+            transition: opacity 0.8s ease 0.8s;
+            pointer-events: none;
+        }
+
+        .screen-input.active .suggestions-label {
+            opacity: 1;
+        }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease 1s;
+            position: relative;
+            z-index: 25;
+        }
+
+        .screen-input.active .suggestion-chips {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .suggestion-chip {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+            position: relative;
+            z-index: 100;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+            pointer-events: auto !important;
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+            transform: translateY(-2px);
+        }
+
+        .suggestion-chip:active {
+            transform: translateY(0);
+        }
+
+        .suggestion-chip.selected {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: var(--black);
+        }
+
+        .or-divider {
+            width: 100%;
+            text-align: center;
+            margin: 1.5rem 0;
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.2);
+            opacity: 0;
+            transition: opacity 0.5s ease 1.2s;
+            pointer-events: none;
+        }
+
+        .screen-input.active .or-divider {
+            opacity: 1;
+        }
+
+        .submit-container {
+            margin-top: 3rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+        }
+
+        .submit-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .submit-btn {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 1rem 3rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gold);
+            transition: left 0.4s ease;
+            z-index: -1;
+        }
+
+        .submit-btn:hover {
+            color: var(--black);
+        }
+
+        .submit-btn:hover::before {
+            left: 0;
+        }
+
+        /* ==========================================
+           SCREEN 2: THE REVEAL (Personalized Response)
+        ========================================== */
+        .screen-reveal {
+            background: transparent;
+            flex-direction: column;
+            padding: 2rem;
+            overflow-y: auto;
+            align-items: flex-start;
+            padding-top: 5vh;
+            padding-bottom: 10vh;
+        }
+
+        .reveal-wrapper {
+            max-width: 1000px;
+            width: 100%;
+            text-align: center;
+            margin: auto;
+        }
+
+        .your-answer-section {
+            margin-bottom: 4rem;
+        }
+
+        .your-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+        }
+
+        .screen-reveal.active .your-label {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .your-answer-display {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 6vw, 4.5rem);
+            font-weight: 300;
+            font-style: italic;
+            color: var(--gold);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease 0.2s;
+        }
+
+        .screen-reveal.active .your-answer-display {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .insight-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .insight-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 2px;
+            padding: 2rem;
+            text-align: left;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .insight-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .insight-card:hover {
+            border-color: rgba(212, 175, 55, 0.3);
+            background: rgba(212, 175, 55, 0.03);
+        }
+
+        .insight-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .insight-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 0.75rem;
+        }
+
+        .insight-text {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .reveal-message {
+            background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, transparent 100%);
+            border-left: 2px solid var(--gold);
+            padding: 2rem;
+            text-align: left;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: all 1s ease 0.8s;
+        }
+
+        .screen-reveal.active .reveal-message {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .reveal-message p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .continue-btn {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            cursor: pointer;
+            padding: 1rem 2.5rem;
+            position: relative;
+            opacity: 0;
+            transition: all 0.4s ease;
+            margin-top: 2rem;
+            overflow: hidden;
+        }
+
+        .continue-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gold);
+            transition: left 0.4s ease;
+            z-index: -1;
+        }
+
+        .continue-btn:hover {
+            color: var(--black);
+        }
+
+        .continue-btn:hover::before {
+            left: 0;
+        }
+
+        .screen-reveal.active .continue-btn,
+        .screen-spectrum.active .continue-btn,
+        .screen-perspectives.active .continue-btn,
+        .screen-profile.active .continue-btn {
+            opacity: 1;
+        }
+
+        /* ==========================================
+           SCREEN 3: THE SPECTRUM (Sliders)
+        ========================================== */
+        .screen-spectrum {
+            background: transparent;
+            padding: 2rem;
+            overflow-y: auto;
+            align-items: flex-start;
+            padding-top: 5vh;
+            padding-bottom: 10vh;
+        }
+
+        .spectrum-wrapper {
+            max-width: 700px;
+            width: 100%;
+            margin: auto;
+        }
+
+        .spectrum-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .spectrum-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 300;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+
+        .screen-spectrum.active .spectrum-title {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .spectrum-subtitle {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.5);
+            opacity: 0;
+            transition: opacity 1s ease 0.3s;
+        }
+
+        .screen-spectrum.active .spectrum-subtitle {
+            opacity: 1;
+        }
+
+        .slider-section {
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .slider-section.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .slider-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .slider-container {
+            position: relative;
+            height: 40px;
+            background: transparent;
+            cursor: pointer;
+            touch-action: none;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            z-index: 20;
+        }
+
+        .slider-track {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+
+        .slider-fill {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+            border-radius: 2px;
+            pointer-events: none;
+        }
+
+        .slider-handle {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            background: var(--gold);
+            border-radius: 50%;
+            cursor: grab;
+            transition: box-shadow 0.2s ease;
+            touch-action: none;
+            z-index: 10;
+        }
+
+        .slider-handle:hover,
+        .slider-handle.dragging {
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .slider-handle:active,
+        .slider-handle.dragging {
+            cursor: grabbing;
+        }
+
+        .slider-value-label {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: rgba(212, 175, 55, 0.7);
+            min-height: 1.2rem;
+            opacity: 1;
+            transition: color 0.3s ease;
+        }
+
+        .slider-section:hover .slider-value-label {
+            color: var(--gold);
+        }
+
+        /* ==========================================
+           SCREEN 4: PERSPECTIVES CAROUSEL
+        ========================================== */
+        .screen-perspectives {
+            background: transparent;
+            padding: 2rem;
+            overflow-y: auto;
+            align-items: flex-start;
+            padding-top: 8vh;
+            padding-bottom: 10vh;
+        }
+
+        .perspectives-wrapper {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            margin: auto;
+        }
+
+        .perspectives-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 300;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transition: all 1s ease;
+        }
+
+        .screen-perspectives.active .perspectives-title {
+            opacity: 1;
+        }
+
+        .perspective-stage {
+            position: relative;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .perspective-item {
+            position: absolute;
+            width: 100%;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .perspective-item.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .perspective-item.exit {
+            opacity: 0;
+            transform: translateX(-100px);
+        }
+
+        .perspective-quote {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 300;
+            font-style: italic;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+        }
+
+        .perspective-quote::before {
+            content: '"';
+            color: var(--gold);
+            font-size: 3rem;
+            line-height: 0;
+            vertical-align: -0.3em;
+            margin-right: 0.1em;
+        }
+
+        .perspective-author {
+            color: var(--gold);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .perspective-context {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .perspective-nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .perspective-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .perspective-dot.active {
+            background: var(--gold);
+            transform: scale(1.3);
+        }
+
+        .perspective-dot:hover {
+            background: rgba(212, 175, 55, 0.5);
+        }
+
+        /* ==========================================
+           SCREEN 5: YOUR PROFILE
+        ========================================== */
+        .screen-profile {
+            background: transparent;
+            padding: 2rem;
+            overflow-y: auto;
+            align-items: flex-start;
+            padding-top: 5vh;
+            padding-bottom: 10vh;
+        }
+
+        .profile-wrapper {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            margin: auto;
+        }
+
+        .profile-visual {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 0 auto 2rem;
+        }
+
+        .profile-orbit {
+            position: absolute;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 50%;
+            animation: orbit 20s linear infinite;
+        }
+
+        .profile-orbit:nth-child(1) {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .profile-orbit:nth-child(2) {
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            animation-duration: 15s;
+            animation-direction: reverse;
+            border-color: rgba(212, 175, 55, 0.4);
+        }
+
+        .profile-orbit:nth-child(3) {
+            width: 40%;
+            height: 40%;
+            top: 30%;
+            left: 30%;
+            animation-duration: 10s;
+            border-color: var(--gold);
+        }
+
+        @keyframes orbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .profile-orbit-dot {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--gold);
+            border-radius: 50%;
+            top: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .profile-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .profile-type-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+
+        .profile-type-subtitle {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.1em;
+        }
+
+        .profile-header {
+            margin-bottom: 2rem;
+        }
+
+        .profile-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 300;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease;
+        }
+
+        .screen-profile.active .profile-title {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .profile-traits {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .trait-tag {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .trait-tag.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .trait-tag:hover {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: var(--gold);
+        }
+
+        .profile-description {
+            background: rgba(255,255,255,0.02);
+            border-left: 2px solid var(--gold);
+            padding: 1.5rem;
+            text-align: left;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transition: all 1s ease 0.5s;
+        }
+
+        .screen-profile.active .profile-description {
+            opacity: 1;
+        }
+
+        .profile-description p {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* ==========================================
+           SCREEN 6: FINAL CTA
+        ========================================== */
+        .screen-cta {
+            background: transparent;
+            padding: 2rem;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        .cta-wrapper {
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .cta-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+
+        .screen-cta.active .cta-title {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cta-subtitle {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 3rem;
+            opacity: 0;
+            transition: all 1s ease 0.3s;
+        }
+
+        .screen-cta.active .cta-subtitle {
+            opacity: 1;
+        }
+
+        .cta-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease 0.5s;
+        }
+
+        .screen-cta.active .cta-buttons {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cta-primary {
+            background: var(--gold);
+            color: var(--black);
+            border: none;
+            padding: 1.25rem 3rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-primary:hover {
+            background: var(--gold-bright);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+            color: var(--black);
+        }
+
+        .cta-secondary {
+            background: transparent;
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 1rem 2.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .cta-secondary:hover {
+            border-color: var(--white);
+        }
+
+        .cta-links {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .cta-link {
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            transition: color 0.3s ease;
+        }
+
+        .cta-link:hover {
+            color: var(--gold);
+        }
+
+        /* ==========================================
+           SHARE MODAL
+        ========================================== */
+        .share-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .share-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .share-content {
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            transform: translateY(30px);
+            transition: transform 0.5s ease;
+        }
+
+        .share-modal.active .share-content {
+            transform: translateY(0);
+        }
+
+        .share-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .share-card {
+            background: linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(212,175,55,0.05) 100%);
+            border: 1px solid rgba(212,175,55,0.3);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .share-card-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .share-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: var(--white);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .share-btn:hover {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: var(--black);
+            transform: translateY(-3px);
+        }
+
+        .close-share {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: var(--white);
+            padding: 0.75rem 2rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-share:hover {
+            border-color: var(--white);
+        }
+
+        /* ==========================================
+           PROGRESS & NAV
+        ========================================== */
+        .progress-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: var(--gold);
+            z-index: 50;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-indicator {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-dot::before {
+            content: attr(data-label);
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-dot:hover::before {
+            opacity: 1;
+        }
+
+        .nav-dot.active {
+            background: var(--gold);
+        }
+
+        .nav-dot.completed {
+            background: rgba(212, 175, 55, 0.5);
+        }
+
+        /* ==========================================
+           RESPONSIVE
+        ========================================== */
+        @media (max-width: 768px) {
+            .nav-indicator {
+                display: none;
+            }
+
+            .insight-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- WebGL Background -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Progress -->
+    <div class="progress-line" id="progressLine"></div>
+
+    <!-- Navigation -->
+    <nav class="nav-indicator" id="navIndicator">
+        <div class="nav-dot active" data-screen="0" data-label="Begin"></div>
+        <div class="nav-dot" data-screen="1" data-label="Define"></div>
+        <div class="nav-dot" data-screen="2" data-label="Reflect"></div>
+        <div class="nav-dot" data-screen="3" data-label="Explore"></div>
+        <div class="nav-dot" data-screen="4" data-label="Discover"></div>
+        <div class="nav-dot" data-screen="5" data-label="Profile"></div>
+        <div class="nav-dot" data-screen="6" data-label="Continue"></div>
+    </nav>
+
+    <!-- SCREEN 0: INTRO -->
+    <div class="screen screen-intro active" id="screen-0">
+        <div class="intro-content">
+            <h1 class="intro-question" id="introQuestion">
+                What Is <span class="highlight">Rich</span>?
+            </h1>
+        </div>
+        <div class="intro-tap">Tap to begin</div>
+        <div class="intro-line"></div>
+    </div>
+
+    <!-- SCREEN 1: INPUT -->
+    <div class="screen screen-input" id="screen-1">
+        <div class="input-wrapper">
+            <p class="input-prompt">To you, what does <span>rich</span> mean?</p>
+            <input type="text" class="the-input" id="userInput" placeholder="Type your answer..." maxlength="80" autocomplete="off">
+            <p class="input-hint">Type your own or choose below</p>
+
+            <p class="suggestions-label">Or select a perspective</p>
+            <div class="suggestion-chips" id="suggestionChips">
+                <button class="suggestion-chip" data-answer="having freedom to spend my time however I want">Freedom & Time</button>
+                <button class="suggestion-chip" data-answer="being surrounded by people who love me">Love & Family</button>
+                <button class="suggestion-chip" data-answer="having enough money to never worry">Financial Security</button>
+                <button class="suggestion-chip" data-answer="good health and peace of mind">Health & Peace</button>
+                <button class="suggestion-chip" data-answer="doing work that matters and makes a difference">Purpose & Impact</button>
+                <button class="suggestion-chip" data-answer="experiencing life to the fullest">Experiences & Adventure</button>
+                <button class="suggestion-chip" data-answer="being content with what I have">Gratitude & Contentment</button>
+                <button class="suggestion-chip" data-answer="creating something meaningful">Creation & Legacy</button>
+                <button class="suggestion-chip" data-answer="having options and choices in life">Options & Opportunity</button>
+                <button class="suggestion-chip" data-answer="independence and not answering to anyone">Independence</button>
+                <button class="suggestion-chip" data-answer="waking up excited about the day ahead">Joy & Fulfillment</button>
+                <button class="suggestion-chip" data-answer="being able to help others">Generosity & Giving</button>
+            </div>
+
+            <div class="or-divider">or type your own above</div>
+
+            <div class="submit-container" id="submitContainer">
+                <button class="submit-btn" id="submitBtn">Reveal My Rich</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: REVEAL -->
+    <div class="screen screen-reveal" id="screen-2">
+        <div class="reveal-wrapper">
+            <div class="your-answer-section">
+                <p class="your-label">You said rich is</p>
+                <h2 class="your-answer-display" id="answerDisplay">"..."</h2>
+            </div>
+
+            <div class="insight-cards" id="insightCards">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="reveal-message" id="revealMessage">
+                <!-- Populated by JS -->
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="continue-btn" id="toSpectrum">Go Deeper →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: SPECTRUM -->
+    <div class="screen screen-spectrum" id="screen-3">
+        <div class="spectrum-wrapper">
+            <div class="spectrum-header">
+                <h2 class="spectrum-title">The Dimensions of <span style="color:var(--gold)">Rich</span></h2>
+                <p class="spectrum-subtitle">Drag the handles to explore what matters most to you</p>
+            </div>
+
+            <div class="sliders-wrapper" id="slidersWrapper">
+                <!-- Populated by JS -->
+            </div>
+
+            <div style="text-align: center; margin-top: 3rem; padding-bottom: 2rem;">
+                <button class="continue-btn" id="toPerspectives">See Perspectives →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 4: PERSPECTIVES -->
+    <div class="screen screen-perspectives" id="screen-4">
+        <div class="perspectives-wrapper">
+            <h2 class="perspectives-title">Voices on <span style="color:var(--gold)">Rich</span></h2>
+
+            <div class="perspective-stage" id="perspectiveStage">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="perspective-nav" id="perspectiveNav">
+                <!-- Populated by JS -->
+            </div>
+
+            <div style="text-align: center; margin-top: 3rem;">
+                <button class="continue-btn" id="toProfile">See Your Profile →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 5: PROFILE -->
+    <div class="screen screen-profile" id="screen-5">
+        <div class="profile-wrapper">
+            <div class="profile-header">
+                <h2 class="profile-title">Your Wealth <span style="color:var(--gold)">Archetype</span></h2>
+            </div>
+
+            <div class="profile-visual">
+                <div class="profile-orbit"><div class="profile-orbit-dot"></div></div>
+                <div class="profile-orbit"><div class="profile-orbit-dot"></div></div>
+                <div class="profile-orbit"><div class="profile-orbit-dot"></div></div>
+                <div class="profile-center">
+                    <div class="profile-type-name" id="profileTypeName">The Seeker</div>
+                    <div class="profile-type-subtitle" id="profileTypeSubtitle">Finding richness in discovery</div>
+                </div>
+            </div>
+
+            <div class="profile-traits" id="profileTraits">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="profile-description" id="profileDescription">
+                <!-- Populated by JS -->
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="continue-btn" id="toCta">Complete Journey →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 6: CTA -->
+    <div class="screen screen-cta" id="screen-6">
+        <div class="cta-wrapper">
+            <h2 class="cta-title">The Film Awaits</h2>
+            <p class="cta-subtitle">You've glimpsed your definition of rich. Now discover how people across the world answer the same question.</p>
+
+            <div class="cta-buttons">
+                <a href="https://www.whatisrichdoc.com/" class="cta-primary" id="exploreMore">Explore the Documentary</a>
+                <button class="cta-secondary" id="shareMyRich">Share My Definition</button>
+            </div>
+
+            <div class="cta-links">
+                <a href="https://www.whatisrichdoc.com/" class="cta-link">Official Site</a>
+                <a href="#" class="cta-link">Instagram</a>
+                <a href="#" class="cta-link">Twitter</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHARE MODAL -->
+    <div class="share-modal" id="shareModal">
+        <div class="share-content">
+            <h3 class="share-title">Share Your Rich</h3>
+            <div class="share-card">
+                <p class="share-card-text" id="shareText">"Rich is..."</p>
+            </div>
+            <div class="share-buttons">
+                <button class="share-btn">𝕏</button>
+                <button class="share-btn">f</button>
+                <button class="share-btn">in</button>
+                <button class="share-btn">📋</button>
+            </div>
+            <button class="close-share" id="closeShare">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // WEBGL PARTICLE BACKGROUND
+        // ==========================================
+        const canvas = document.getElementById('webgl-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particles = [];
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetMouseX = 0;
+        let targetMouseY = 0;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function createParticles() {
+            particles = [];
+            const count = Math.min(150, Math.floor((canvas.width * canvas.height) / 15000));
+
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    size: Math.random() * 2 + 0.5,
+                    alpha: Math.random() * 0.5 + 0.1,
+                    golden: Math.random() > 0.85
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Smooth mouse following
+            mouseX += (targetMouseX - mouseX) * 0.05;
+            mouseY += (targetMouseY - mouseY) * 0.05;
+
+            particles.forEach((p, i) => {
+                // Mouse influence
+                const dx = mouseX - p.x;
+                const dy = mouseY - p.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 200) {
+                    const force = (200 - dist) / 200;
+                    p.vx -= (dx / dist) * force * 0.02;
+                    p.vy -= (dy / dist) * force * 0.02;
+                }
+
+                // Update position
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Damping
+                p.vx *= 0.99;
+                p.vy *= 0.99;
+
+                // Wrap around
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+
+                // Draw
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                if (p.golden) {
+                    ctx.fillStyle = `rgba(212, 175, 55, ${p.alpha})`;
+                } else {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha * 0.5})`;
+                }
+                ctx.fill();
+
+                // Connect nearby particles
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx2 = p.x - p2.x;
+                    const dy2 = p.y - p2.y;
+                    const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+
+                    if (dist2 < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        const lineAlpha = (1 - dist2 / 120) * 0.15;
+                        if (p.golden || p2.golden) {
+                            ctx.strokeStyle = `rgba(212, 175, 55, ${lineAlpha})`;
+                        } else {
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${lineAlpha * 0.5})`;
+                        }
+                        ctx.stroke();
+                    }
+                }
+            });
+
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            createParticles();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            targetMouseX = e.clientX;
+            targetMouseY = e.clientY;
+        });
+
+        resizeCanvas();
+        createParticles();
+        animateParticles();
+
+        // ==========================================
+        // DATA
+        // ==========================================
+        const analysisData = [
+            { icon: '💎', title: 'Material Abundance', keywords: ['money', 'cash', 'wealthy', 'millionaire', 'billionaire', 'buy', 'afford', 'expensive', 'luxury'], text: 'Your answer touches on financial wealth. In our documentary, we explore how material abundance shapes our lives in unexpected ways.' },
+            { icon: '❤️', title: 'Human Connection', keywords: ['family', 'friends', 'love', 'people', 'relationship', 'together', 'children', 'partner', 'community'], text: 'Relationships define your richness. Research confirms what you intuitively know: our bonds predict our wellbeing.' },
+            { icon: '⏳', title: 'Time & Freedom', keywords: ['time', 'freedom', 'free', 'choice', 'flexible', 'control', 'retire', 'travel', 'independence'], text: 'Time is your true currency. The documentary features voices who traded fortunes for freedom—and never looked back.' },
+            { icon: '🌱', title: 'Health & Vitality', keywords: ['health', 'healthy', 'peace', 'mind', 'body', 'energy', 'alive', 'wellness', 'balance'], text: 'Health as wealth—a perspective that crystallizes with age. We met people who lost everything yet felt rich with their health intact.' },
+            { icon: '🎯', title: 'Purpose & Meaning', keywords: ['purpose', 'meaning', 'impact', 'help', 'change', 'matter', 'legacy', 'mission', 'difference'], text: 'Purpose is your measure. The film explores how meaning transforms everything—from prison cells to corner offices.' },
+            { icon: '✨', title: 'Experience & Growth', keywords: ['experience', 'learn', 'grow', 'adventure', 'memories', 'moments', 'journey', 'discover', 'wisdom'], text: 'You measure wealth in experiences. We followed people who traded possessions for passports and found themselves richer.' },
+            { icon: '🙏', title: 'Gratitude & Presence', keywords: ['grateful', 'enough', 'happy', 'content', 'blessed', 'appreciate', 'simple', 'present', 'thankful'], text: 'Contentment is your compass. The documentary reveals how some with the least material wealth exhibit the greatest abundance.' },
+            { icon: '🔥', title: 'Passion & Creation', keywords: ['passion', 'create', 'art', 'music', 'build', 'make', 'dream', 'express', 'craft'], text: 'Creative expression defines your richness. We showcase artists who turned away from wealth to pursue their craft.' }
+        ];
+
+        const sliderData = [
+            { left: 'Security', right: 'Freedom', id: 'security' },
+            { left: 'Time', right: 'Money', id: 'time' },
+            { left: 'Depth', right: 'Breadth', id: 'depth' },
+            { left: 'Stability', right: 'Adventure', id: 'stability' },
+            { left: 'Recognition', right: 'Peace', id: 'recognition' }
+        ];
+
+        const perspectivesData = [
+            { quote: "I had fifty million and felt empty. Now I have enough, and I have everything.", author: "Former Tech CEO", context: "Silicon Valley" },
+            { quote: "Rich is watching my grandchildren play in the fields I played in as a child.", author: "Farmer", context: "Rural Japan" },
+            { quote: "When you survive what I survived, breathing is rich. Walking is rich.", author: "Refugee", context: "Originally Syria" },
+            { quote: "I measure wealth in the number of lives I've changed.", author: "Teacher", context: "Chicago" },
+            { quote: "Rich is having options. Not diamonds—options.", author: "Entrepreneur", context: "Lagos, Nigeria" },
+            { quote: "True wealth? Not needing to check the price—or the time.", author: "Investor", context: "Monaco" }
+        ];
+
+        const profileTypes = [
+            { name: 'The Philosopher', subtitle: 'Finding richness in meaning', traits: ['Contemplative', 'Values-led', 'Purpose-driven', 'Reflective'], description: 'You see wealth as a deeper question than numbers in an account. For you, richness is found in the examined life. The documentary will both challenge and affirm your worldview.' },
+            { name: 'The Connector', subtitle: 'Finding richness in bonds', traits: ['Heart-centered', 'Empathetic', 'Community-minded', 'Relationship-focused'], description: 'Your wealth is measured in bonds, not stocks. You understand intuitively what research confirms: our relationships are the greatest predictor of wellbeing.' },
+            { name: 'The Liberator', subtitle: 'Finding richness in freedom', traits: ['Independence-seeking', 'Time-conscious', 'Choice-driven', 'Boundary-setter'], description: 'Freedom is your currency. The documentary explores how people around the world have traded traditional wealth for something you understand well: liberty.' },
+            { name: 'The Builder', subtitle: 'Finding richness in creation', traits: ['Legacy-minded', 'Impact-focused', 'Achievement-oriented', 'Growth-driven'], description: 'You see wealth as what you create, not what you accumulate. Building something meaningful is where you find richness.' },
+            { name: 'The Present', subtitle: 'Finding richness in now', traits: ['Moment-focused', 'Gratitude-driven', 'Experience-rich', 'Simplicity-seeking'], description: 'The eternal now is where your wealth lives. While others chase future riches, you find abundance in the present moment.' },
+            { name: 'The Balanced', subtitle: 'Finding richness in harmony', traits: ['Holistic', 'Nuanced', 'Multi-dimensional', 'Integrative'], description: 'You resist simple definitions because richness is multifaceted. The documentary speaks to your nuanced view of wealth.' }
+        ];
+
+        // ==========================================
+        // STATE
+        // ==========================================
+        let currentScreen = 0;
+        let userAnswer = '';
+        let sliderValues = {};
+        let matchedAnalysis = [];
+        let currentPerspective = 0;
+        let perspectiveInterval;
+
+        // ==========================================
+        // SCREEN MANAGEMENT
+        // ==========================================
+        function showScreen(num) {
+            const current = document.querySelector('.screen.active');
+            const next = document.getElementById(`screen-${num}`);
+
+            if (current && current !== next) {
+                current.classList.add('exit');
+                setTimeout(() => {
+                    current.classList.remove('active', 'exit');
+                }, 1000);
+            }
+
+            setTimeout(() => {
+                next.classList.add('active');
+                currentScreen = num;
+                updateProgress();
+                updateNav();
+
+                // Screen-specific animations
+                if (num === 1) focusInput();
+                if (num === 2) animateInsightCards();
+                if (num === 3) animateSliders();
+                if (num === 4) startPerspectives();
+                if (num === 5) animateProfile();
+            }, current ? 500 : 0);
+        }
+
+        function updateProgress() {
+            const progress = (currentScreen / 6) * 100;
+            document.getElementById('progressLine').style.width = `${progress}%`;
+        }
+
+        function updateNav() {
+            document.querySelectorAll('.nav-dot').forEach((dot, i) => {
+                dot.classList.remove('active', 'completed');
+                if (i === currentScreen) dot.classList.add('active');
+                if (i < currentScreen) dot.classList.add('completed');
+            });
+        }
+
+        // ==========================================
+        // INTRO ANIMATION
+        // ==========================================
+        function animateIntro() {
+            const question = document.getElementById('introQuestion');
+            const text = question.innerHTML;
+
+            let html = '';
+            let charIndex = 0;
+            const words = text.split(/(<span[^>]*>.*?<\/span>|[^<\s]+|\s)/g).filter(Boolean);
+
+            words.forEach(word => {
+                if (word.includes('<span')) {
+                    const inner = word.match(/>([^<]+)</)[1];
+                    const before = word.split('>')[0] + '>';
+                    const after = '</span>';
+                    html += before;
+                    inner.split('').forEach(char => {
+                        html += `<span class="char" style="animation-delay:${0.5 + charIndex * 0.05}s">${char}</span>`;
+                        charIndex++;
+                    });
+                    html += after;
+                } else if (word === ' ') {
+                    html += ' ';
+                } else {
+                    word.split('').forEach(char => {
+                        html += `<span class="char" style="animation-delay:${0.5 + charIndex * 0.05}s">${char}</span>`;
+                        charIndex++;
+                    });
+                }
+            });
+
+            question.innerHTML = html;
+            question.style.opacity = '1';
+        }
+
+        // ==========================================
+        // INPUT HANDLING
+        // ==========================================
+        function setupInput() {
+            const input = document.getElementById('userInput');
+            const submitContainer = document.getElementById('submitContainer');
+            const chips = document.querySelectorAll('.suggestion-chip');
+            let selectedChip = null;
+
+            // Input typing
+            input.addEventListener('input', () => {
+                // Clear any selected chip when typing
+                if (selectedChip) {
+                    selectedChip.classList.remove('selected');
+                    selectedChip = null;
+                }
+                if (input.value.length > 0) {
+                    submitContainer.classList.add('visible');
+                } else {
+                    submitContainer.classList.remove('visible');
+                }
+            });
+
+            // Focus input - make it more clickable
+            input.addEventListener('click', () => {
+                input.focus();
+            });
+
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && input.value.trim()) {
+                    processAnswer();
+                }
+            });
+
+            // Suggestion chips
+            chips.forEach(chip => {
+                chip.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Deselect previous
+                    if (selectedChip) {
+                        selectedChip.classList.remove('selected');
+                    }
+
+                    // Select this one
+                    chip.classList.add('selected');
+                    selectedChip = chip;
+
+                    // Set input value
+                    input.value = chip.dataset.answer;
+                    submitContainer.classList.add('visible');
+
+                    // Auto-submit after brief delay for visual feedback
+                    setTimeout(() => {
+                        processAnswer();
+                    }, 400);
+                });
+            });
+
+            document.getElementById('submitBtn').addEventListener('click', () => {
+                if (input.value.trim()) processAnswer();
+            });
+        }
+
+        function focusInput() {
+            setTimeout(() => {
+                const input = document.getElementById('userInput');
+                if (input) {
+                    input.focus();
+                }
+            }, 800);
+        }
+
+        function processAnswer() {
+            userAnswer = document.getElementById('userInput').value.trim();
+            if (!userAnswer) return;
+            analyzeAnswer();
+            showScreen(2);
+        }
+
+        function analyzeAnswer() {
+            const lower = userAnswer.toLowerCase();
+            matchedAnalysis = [];
+
+            analysisData.forEach(item => {
+                const matches = item.keywords.filter(k => lower.includes(k)).length;
+                if (matches > 0) {
+                    matchedAnalysis.push({ ...item, score: matches });
+                }
+            });
+
+            matchedAnalysis.sort((a, b) => b.score - a.score);
+            matchedAnalysis = matchedAnalysis.slice(0, 3);
+
+            if (matchedAnalysis.length === 0) {
+                matchedAnalysis.push({
+                    icon: '🌟',
+                    title: 'Unique Vision',
+                    text: 'Your definition defies easy categorization—which often signals the most profound perspectives. The documentary features voices who share your singular view.'
+                });
+            }
+
+            // Populate reveal screen
+            document.getElementById('answerDisplay').textContent = `"${userAnswer}"`;
+
+            const cardsContainer = document.getElementById('insightCards');
+            cardsContainer.innerHTML = matchedAnalysis.map(item => `
+                <div class="insight-card">
+                    <div class="insight-icon">${item.icon}</div>
+                    <h3 class="insight-title">${item.title}</h3>
+                    <p class="insight-text">${item.text}</p>
+                </div>
+            `).join('');
+
+            document.getElementById('revealMessage').innerHTML = `
+                <p>When you say rich is "${userAnswer}", you join a conversation spanning centuries. In <em>What Is Rich?</em>, we asked this question across 12 countries—billionaires and monks, CEOs and children. What we found will resonate with your answer.</p>
+            `;
+        }
+
+        function animateInsightCards() {
+            document.querySelectorAll('.insight-card').forEach((card, i) => {
+                setTimeout(() => card.classList.add('visible'), 300 + i * 200);
+            });
+        }
+
+        // ==========================================
+        // SLIDERS
+        // ==========================================
+        let activeSlider = null;
+
+        function setupSliders() {
+            const wrapper = document.getElementById('slidersWrapper');
+
+            sliderData.forEach(s => {
+                sliderValues[s.id] = 50;
+
+                const section = document.createElement('div');
+                section.className = 'slider-section';
+                section.innerHTML = `
+                    <div class="slider-header">
+                        <span class="slider-label">${s.left}</span>
+                        <span class="slider-label">${s.right}</span>
+                    </div>
+                    <div class="slider-container" data-id="${s.id}" data-left="${s.left}" data-right="${s.right}">
+                        <div class="slider-track"></div>
+                        <div class="slider-fill" style="width: 50%"></div>
+                        <div class="slider-handle" style="left: 50%"></div>
+                    </div>
+                    <div class="slider-value-label" id="label-${s.id}">Balanced</div>
+                `;
+                wrapper.appendChild(section);
+            });
+        }
+
+        function updateSliderPosition(container, clientX) {
+            const rect = container.getBoundingClientRect();
+            let percent = ((clientX - rect.left) / rect.width) * 100;
+            percent = Math.max(0, Math.min(100, percent));
+
+            const id = container.dataset.id;
+            const left = container.dataset.left;
+            const right = container.dataset.right;
+
+            sliderValues[id] = Math.round(percent);
+            container.querySelector('.slider-fill').style.width = `${percent}%`;
+            container.querySelector('.slider-handle').style.left = `${percent}%`;
+
+            // Update label
+            const label = document.getElementById(`label-${id}`);
+            if (label) {
+                if (percent < 35) label.textContent = `Leaning ${left.toLowerCase()}`;
+                else if (percent > 65) label.textContent = `Leaning ${right.toLowerCase()}`;
+                else label.textContent = 'Balanced';
+            }
+        }
+
+        function initSliderInteractions() {
+            // Use event delegation on the sliders wrapper
+            const wrapper = document.getElementById('slidersWrapper');
+            if (!wrapper) return;
+
+            const getSliderContainer = (el) => {
+                while (el && !el.classList.contains('slider-container')) {
+                    el = el.parentElement;
+                }
+                return el;
+            };
+
+            const handleStart = (e) => {
+                const container = getSliderContainer(e.target);
+                if (!container) return;
+
+                e.preventDefault();
+                activeSlider = container;
+                container.querySelector('.slider-handle').classList.add('dragging');
+
+                const clientX = e.clientX !== undefined ? e.clientX : e.touches[0].clientX;
+                updateSliderPosition(container, clientX);
+            };
+
+            const handleMove = (e) => {
+                if (!activeSlider) return;
+                e.preventDefault();
+
+                const clientX = e.clientX !== undefined ? e.clientX : e.touches[0].clientX;
+                updateSliderPosition(activeSlider, clientX);
+            };
+
+            const handleEnd = () => {
+                if (activeSlider) {
+                    activeSlider.querySelector('.slider-handle').classList.remove('dragging');
+                    activeSlider = null;
+                }
+            };
+
+            // Attach to wrapper for start events
+            wrapper.addEventListener('mousedown', handleStart);
+            wrapper.addEventListener('touchstart', handleStart, { passive: false });
+
+            // Attach to document for move/end events
+            document.addEventListener('mousemove', handleMove);
+            document.addEventListener('touchmove', handleMove, { passive: false });
+            document.addEventListener('mouseup', handleEnd);
+            document.addEventListener('touchend', handleEnd);
+            document.addEventListener('mouseleave', handleEnd);
+        }
+
+        function animateSliders() {
+            document.querySelectorAll('.slider-section').forEach((s, i) => {
+                setTimeout(() => s.classList.add('visible'), 200 + i * 150);
+            });
+        }
+
+        // ==========================================
+        // PERSPECTIVES
+        // ==========================================
+        function setupPerspectives() {
+            const stage = document.getElementById('perspectiveStage');
+            const nav = document.getElementById('perspectiveNav');
+
+            perspectivesData.forEach((p, i) => {
+                const item = document.createElement('div');
+                item.className = `perspective-item ${i === 0 ? 'active' : ''}`;
+                item.innerHTML = `
+                    <p class="perspective-quote">${p.quote}</p>
+                    <p class="perspective-author">${p.author}</p>
+                    <p class="perspective-context">${p.context}</p>
+                `;
+                stage.appendChild(item);
+
+                const dot = document.createElement('div');
+                dot.className = `perspective-dot ${i === 0 ? 'active' : ''}`;
+                dot.addEventListener('click', () => showPerspective(i));
+                nav.appendChild(dot);
+            });
+        }
+
+        function showPerspective(index) {
+            const items = document.querySelectorAll('.perspective-item');
+            const dots = document.querySelectorAll('.perspective-dot');
+
+            items[currentPerspective].classList.add('exit');
+            items[currentPerspective].classList.remove('active');
+            dots[currentPerspective].classList.remove('active');
+
+            setTimeout(() => {
+                items[currentPerspective].classList.remove('exit');
+                currentPerspective = index;
+                items[currentPerspective].classList.add('active');
+                dots[currentPerspective].classList.add('active');
+            }, 400);
+        }
+
+        function startPerspectives() {
+            clearInterval(perspectiveInterval);
+            perspectiveInterval = setInterval(() => {
+                showPerspective((currentPerspective + 1) % perspectivesData.length);
+            }, 5000);
+        }
+
+        // ==========================================
+        // PROFILE
+        // ==========================================
+        function generateProfile() {
+            // Simple algorithm based on sliders and matched analysis
+            let profileIndex = 5; // Default: Balanced
+
+            const timeValue = sliderValues.time || 50;
+            const securityValue = sliderValues.security || 50;
+            const recognitionValue = sliderValues.recognition || 50;
+
+            // Check answer matches first
+            if (matchedAnalysis.some(a => a.title.includes('Purpose') || a.title.includes('Creation'))) {
+                profileIndex = 3; // Builder
+            } else if (matchedAnalysis.some(a => a.title.includes('Connection'))) {
+                profileIndex = 1; // Connector
+            } else if (matchedAnalysis.some(a => a.title.includes('Time') || a.title.includes('Freedom'))) {
+                profileIndex = 2; // Liberator
+            } else if (matchedAnalysis.some(a => a.title.includes('Gratitude') || a.title.includes('Presence'))) {
+                profileIndex = 4; // Present
+            } else if (securityValue < 30 && recognitionValue > 70) {
+                profileIndex = 2; // Liberator
+            } else if (timeValue < 30) {
+                profileIndex = 4; // Present
+            } else {
+                profileIndex = 0; // Philosopher
+            }
+
+            const profile = profileTypes[profileIndex];
+
+            document.getElementById('profileTypeName').textContent = profile.name;
+            document.getElementById('profileTypeSubtitle').textContent = profile.subtitle;
+
+            const traitsContainer = document.getElementById('profileTraits');
+            traitsContainer.innerHTML = profile.traits.map(t => `<span class="trait-tag">${t}</span>`).join('');
+
+            document.getElementById('profileDescription').innerHTML = `<p>${profile.description}</p>`;
+        }
+
+        function animateProfile() {
+            generateProfile();
+            document.querySelectorAll('.trait-tag').forEach((t, i) => {
+                setTimeout(() => t.classList.add('visible'), 300 + i * 100);
+            });
+        }
+
+        // ==========================================
+        // SHARE
+        // ==========================================
+        function setupShare() {
+            document.getElementById('shareMyRich').addEventListener('click', () => {
+                document.getElementById('shareText').textContent = `"Rich is ${userAnswer}"`;
+                document.getElementById('shareModal').classList.add('active');
+            });
+
+            document.getElementById('closeShare').addEventListener('click', () => {
+                document.getElementById('shareModal').classList.remove('active');
+            });
+
+            document.getElementById('shareModal').addEventListener('click', (e) => {
+                if (e.target.id === 'shareModal') {
+                    document.getElementById('shareModal').classList.remove('active');
+                }
+            });
+        }
+
+        // ==========================================
+        // NAVIGATION
+        // ==========================================
+        function setupNavigation() {
+            // Intro click
+            document.getElementById('screen-0').addEventListener('click', () => {
+                if (currentScreen === 0) showScreen(1);
+            });
+
+            // Continue buttons
+            document.getElementById('toSpectrum').addEventListener('click', () => showScreen(3));
+            document.getElementById('toPerspectives').addEventListener('click', () => showScreen(4));
+            document.getElementById('toProfile').addEventListener('click', () => showScreen(5));
+            document.getElementById('toCta').addEventListener('click', () => showScreen(6));
+
+            // Nav dots
+            document.querySelectorAll('.nav-dot').forEach(dot => {
+                dot.addEventListener('click', () => {
+                    const target = parseInt(dot.dataset.screen);
+                    // Only allow navigation to completed screens or current+1
+                    if (target <= currentScreen || (target === currentScreen + 1 && (currentScreen === 0 || userAnswer))) {
+                        showScreen(target);
+                    }
+                });
+            });
+        }
+
+        // ==========================================
+        // INIT
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            animateIntro();
+            setupInput();
+            setupSliders();
+            setupPerspectives();
+            setupShare();
+            setupNavigation();
+            showScreen(0);
+
+            // Initialize slider interactions after a short delay to ensure DOM is ready
+            setTimeout(initSliderInteractions, 100);
+        });
+    </script>
+</body>
+</html>
