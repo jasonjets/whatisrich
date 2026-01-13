@@ -33,12 +33,62 @@ const perspectivesData = [
 ]
 
 const profileTypes = [
-  { name: 'The Philosopher', subtitle: 'Finding richness in meaning', traits: ['Contemplative', 'Values-led', 'Purpose-driven', 'Reflective'], description: 'You see wealth as a deeper question than numbers in an account. For you, richness is found in the examined life. The documentary will both challenge and affirm your worldview.' },
-  { name: 'The Connector', subtitle: 'Finding richness in bonds', traits: ['Heart-centered', 'Empathetic', 'Community-minded', 'Relationship-focused'], description: 'Your wealth is measured in bonds, not stocks. You understand intuitively what research confirms: our relationships are the greatest predictor of wellbeing.' },
-  { name: 'The Liberator', subtitle: 'Finding richness in freedom', traits: ['Independence-seeking', 'Time-conscious', 'Choice-driven', 'Boundary-setter'], description: 'Freedom is your currency. The documentary explores how people around the world have traded traditional wealth for something you understand well: liberty.' },
-  { name: 'The Builder', subtitle: 'Finding richness in creation', traits: ['Legacy-minded', 'Impact-focused', 'Achievement-oriented', 'Growth-driven'], description: 'You see wealth as what you create, not what you accumulate. Building something meaningful is where you find richness.' },
-  { name: 'The Present', subtitle: 'Finding richness in now', traits: ['Moment-focused', 'Gratitude-driven', 'Experience-rich', 'Simplicity-seeking'], description: 'The eternal now is where your wealth lives. While others chase future riches, you find abundance in the present moment.' },
-  { name: 'The Balanced', subtitle: 'Finding richness in harmony', traits: ['Holistic', 'Nuanced', 'Multi-dimensional', 'Integrative'], description: 'You resist simple definitions because richness is multifaceted. The documentary speaks to your nuanced view of wealth.' }
+  {
+    name: 'The Time Billionaire',
+    subtitle: 'Time is the only real flex',
+    traits: ['Hates being rushed', 'Optimizes life, not just money', 'Time-conscious', 'Freedom-focused'],
+    description: 'You understand that time is the ultimate currency. While others chase money, you\'ve optimized your life to maximize freedom and minimize obligations. The documentary explores how people around the world have traded traditional wealth for something you understand well: the luxury of time.',
+    shareLine: "I'm rich in time."
+  },
+  {
+    name: 'The Asset Alchemist',
+    subtitle: 'Turns effort into ownership',
+    traits: ['Sees assets everywhere', 'Thinks in leverage, not labor', 'Builds systems', 'Ownership-minded'],
+    description: 'You see opportunities to convert work into lasting value. Where others see jobs, you see assets. You think in systems, leverage, and ownership—turning every effort into something that works for you long-term.',
+    shareLine: 'I turn work into wealth.'
+  },
+  {
+    name: 'The Plug',
+    subtitle: 'Access beats money',
+    traits: ['Always knows who to call', 'Power through relationships', 'Network-focused', 'Connection-driven'],
+    description: 'Your wealth lives in your relationships. You understand that the right connection at the right time is worth more than any amount of money. Your network isn\'t just contacts—it\'s your infrastructure.',
+    shareLine: 'My network is my net worth.'
+  },
+  {
+    name: 'The Firewall',
+    subtitle: 'Wealth protects peace',
+    traits: ['Low drama, high margin', 'Emergency-ready', 'Stress-resistant', 'Security-focused'],
+    description: 'You\'ve built wealth as a buffer against chaos. Financial security isn\'t about showing off—it\'s about creating a life where emergencies can\'t touch your peace. You sleep well because you\'re prepared.',
+    shareLine: 'Nothing can touch my peace.'
+  },
+  {
+    name: 'The Visionary',
+    subtitle: 'Wealth is seeing first',
+    traits: ['Early mover', 'Invests before it\'s obvious', 'Forward-thinking', 'Trend-spotting'],
+    description: 'You see value before others do. While the crowd follows trends, you\'re already moving to the next opportunity. Your wealth comes from recognizing patterns, timing, and potential that others miss.',
+    shareLine: 'I see it before it\'s valuable.'
+  },
+  {
+    name: 'The Pillar',
+    subtitle: 'Others depend on me',
+    traits: ['Family anchor', 'Team foundation', 'Community support', 'Responsibility-driven'],
+    description: 'Your wealth is measured by the people who count on you. You build not just for yourself, but as the foundation others can stand on. Being reliable, stable, and dependable is your form of richness.',
+    shareLine: 'I\'m the foundation.'
+  },
+  {
+    name: 'The Catalyst',
+    subtitle: 'Money accelerates change',
+    traits: ['Funds ideas', 'Supports people', 'Drives movements', 'Momentum-focused'],
+    description: 'You use wealth as fuel for transformation. Money isn\'t the goal—it\'s the tool that lets you fund ideas, support people, and drive movements. You thrive on momentum and making things happen.',
+    shareLine: 'I make things happen.'
+  },
+  {
+    name: 'The Aesthetic',
+    subtitle: 'Wealth should look and feel good',
+    traits: ['Design-focused', 'Lifestyle-driven', 'Experience-rich', 'Expressive'],
+    description: 'You believe wealth should be beautiful. It\'s not shallow—it\'s expressive. You invest in design, experiences, and lifestyle because how your life looks and feels matters. Your environment reflects your values.',
+    shareLine: 'My life reflects my taste.'
+  }
 ]
 
 const suggestions = [
@@ -76,7 +126,7 @@ export default function Home() {
   })
   const [currentPerspective, setCurrentPerspective] = useState(0)
   const [exitingPerspective, setExitingPerspective] = useState<number | null>(null)
-  const [profile, setProfile] = useState(profileTypes[5])
+  const [profile, setProfile] = useState(profileTypes[0])
   const [showShareModal, setShowShareModal] = useState(false)
   const [visibleCards, setVisibleCards] = useState<number[]>([])
   const [visibleSliders, setVisibleSliders] = useState<number[]>([])
@@ -86,16 +136,28 @@ export default function Home() {
   const inputRef = useRef<HTMLInputElement>(null)
   const perspectiveIntervalRef = useRef<NodeJS.Timeout>()
   const activeSliderRef = useRef<string | null>(null)
+  const isTransitioningRef = useRef(false)
 
   // Show screen with exit animation
   const showScreen = useCallback((num: number) => {
-    if (num === currentScreen) return
+    if (num === currentScreen || isTransitioningRef.current) return
+    isTransitioningRef.current = true
     setExitingScreen(currentScreen)
     setTimeout(() => {
       setCurrentScreen(num)
       setExitingScreen(null)
+      isTransitioningRef.current = false
     }, 500)
   }, [currentScreen])
+
+  // Handle intro click/touch - works on any element within the intro screen
+  const handleIntroClick = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    if (currentScreen === 0 && !isTransitioningRef.current) {
+      e.preventDefault()
+      e.stopPropagation()
+      showScreen(1)
+    }
+  }, [currentScreen, showScreen])
 
   // Animate intro on mount
   useEffect(() => {
@@ -161,26 +223,44 @@ export default function Home() {
   }, [currentScreen, matchedAnalysis, sliderValues])
 
   const generateProfile = () => {
-    let profileIndex = 5
+    let profileIndex = 0
 
     const timeValue = sliderValues.time || 50
     const securityValue = sliderValues.security || 50
     const recognitionValue = sliderValues.recognition || 50
+    const depthValue = sliderValues.depth || 50
+    const stabilityValue = sliderValues.stability || 50
 
-    if (matchedAnalysis.some(a => a.title.includes('Purpose') || a.title.includes('Creation'))) {
-      profileIndex = 3
+    // Map to new archetypes based on analysis and slider values
+    if (matchedAnalysis.some(a => a.title.includes('Time') || a.title.includes('Freedom'))) {
+      profileIndex = 0 // The Time Billionaire
+    } else if (matchedAnalysis.some(a => a.title.includes('Material') || a.title.includes('Abundance'))) {
+      profileIndex = 1 // The Asset Alchemist
     } else if (matchedAnalysis.some(a => a.title.includes('Connection'))) {
-      profileIndex = 1
-    } else if (matchedAnalysis.some(a => a.title.includes('Time') || a.title.includes('Freedom'))) {
-      profileIndex = 2
+      profileIndex = 2 // The Plug
+    } else if (matchedAnalysis.some(a => a.title.includes('Health') || a.title.includes('Vitality'))) {
+      profileIndex = 3 // The Firewall
+    } else if (matchedAnalysis.some(a => a.title.includes('Experience') || a.title.includes('Growth'))) {
+      profileIndex = 4 // The Visionary
+    } else if (matchedAnalysis.some(a => a.title.includes('Purpose') || a.title.includes('Meaning'))) {
+      profileIndex = 5 // The Pillar
+    } else if (matchedAnalysis.some(a => a.title.includes('Passion') || a.title.includes('Creation'))) {
+      profileIndex = 6 // The Catalyst
     } else if (matchedAnalysis.some(a => a.title.includes('Gratitude') || a.title.includes('Presence'))) {
-      profileIndex = 4
-    } else if (securityValue < 30 && recognitionValue > 70) {
-      profileIndex = 2
-    } else if (timeValue < 30) {
-      profileIndex = 4
+      profileIndex = 7 // The Aesthetic
     } else {
-      profileIndex = 0
+      // Fallback based on slider values
+      if (timeValue > 70) {
+        profileIndex = 0 // The Time Billionaire
+      } else if (securityValue > 70) {
+        profileIndex = 3 // The Firewall
+      } else if (recognitionValue > 70) {
+        profileIndex = 6 // The Catalyst
+      } else if (depthValue > 70) {
+        profileIndex = 4 // The Visionary
+      } else {
+        profileIndex = 5 // The Pillar (default)
+      }
     }
 
     setProfile(profileTypes[profileIndex])
@@ -330,35 +410,62 @@ export default function Home() {
       {/* SCREEN 0: INTRO */}
       <div
         className={`screen screen-intro ${currentScreen === 0 ? 'active' : ''} ${exitingScreen === 0 ? 'exit' : ''}`}
-        onClick={() => currentScreen === 0 && showScreen(1)}
+        onClick={handleIntroClick}
+        onTouchStart={handleIntroClick}
+        style={{ 
+          cursor: currentScreen === 0 ? 'pointer' : 'default',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 10
+        }}
       >
-        <div className="intro-content">
-          <h1 className={`intro-question ${introAnimated ? 'visible' : ''}`}>
-            {introAnimated ? (
-              <>
-                {'What Is '.split('').map((char, i) => (
-                  <span key={i} className="char" style={{ animationDelay: `${0.5 + i * 0.05}s` }}>
-                    {char === ' ' ? '\u00A0' : char}
-                  </span>
-                ))}
-                <span className="highlight">
-                  {'Rich'.split('').map((char, i) => (
-                    <span key={i} className="char" style={{ animationDelay: `${0.5 + (8 + i) * 0.05}s` }}>
-                      {char}
-                    </span>
-                  ))}
-                </span>
-                {'?'.split('').map((char, i) => (
-                  <span key={i} className="char" style={{ animationDelay: `${0.5 + (12 + i) * 0.05}s` }}>
-                    {char}
-                  </span>
-                ))}
-              </>
-            ) : 'What Is Rich?'}
-          </h1>
+        <div className="cinematic-intro" onClick={handleIntroClick} onTouchStart={handleIntroClick} style={{ pointerEvents: 'auto' }}>
+          {/* Producer Credits */}
+          <div className={`producer-credits ${introAnimated ? 'visible' : ''}`}>
+            <div className="producer-block">
+              <div className="producer-presents">PRODUCED BY</div>
+              <div className="producer-name">RUSHION MCDONALD</div>
+              <div className="producer-accolades">
+                <div className="accolade">2X EMMY AWARD WINNER</div>
+                <div className="accolade">3X NAACP IMAGE AWARD WINNER</div>
+                <div className="accolade-divider"></div>
+                <div className="accolade-role">HOST, SERIAL ENTREPRENEUR & COMMUNITY LEADER</div>
+                <div className="accolade-detail">CEO & FOUNDER OF TEXAS BLACK EXPO</div>
+                <div className="accolade-subdetail">The Largest African American Business Trade Show in the Southern U.S.</div>
+              </div>
+            </div>
+
+            <div className="producer-divider"></div>
+
+            <div className="producer-block secondary">
+              <div className="producer-name secondary">JEROME LOVE</div>
+              <div className="producer-accolades">
+                <div className="accolade">NAACP IMAGE AWARD WINNER</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Title */}
+          <div className={`main-title-block ${introAnimated ? 'visible' : ''}`}>
+            <div className="title-ornament top"></div>
+            <h1 className="cinematic-title">
+              <span className="title-what">What Is</span>
+              <span className="title-rich">Rich</span>
+              <span className="title-question">?</span>
+            </h1>
+            <div className="title-ornament bottom"></div>
+            <div className="title-tagline">A Cinematic Exploration</div>
+          </div>
+
+          {/* Call to Action */}
+          <div className={`cinematic-cta ${introAnimated ? 'visible' : ''}`}>
+            <div className="cta-pulse"></div>
+            <div className="cta-text">TAP TO BEGIN YOUR JOURNEY</div>
+          </div>
         </div>
-        <div className="intro-tap">Tap to begin</div>
-        <div className="intro-line" />
       </div>
 
       {/* SCREEN 1: INPUT */}
@@ -583,13 +690,99 @@ export default function Home() {
         <div className="share-content">
           <h3 className="share-title">Share Your Rich</h3>
           <div className="share-card">
-            <p className="share-card-text">&ldquo;Rich is {userAnswer}&rdquo;</p>
+            <p className="share-card-text">&ldquo;{profile.shareLine}&rdquo;</p>
           </div>
           <div className="share-buttons">
-            <button className="share-btn">𝕏</button>
-            <button className="share-btn">f</button>
-            <button className="share-btn">in</button>
-            <button className="share-btn">📋</button>
+            <button
+              className="share-btn"
+              id="shareInstagram"
+              title="Share on Instagram"
+              onClick={() => {
+                const shareText = `${profile.shareLine}\n\nExplore more: ${window.location.href}`
+                navigator.clipboard.writeText(shareText).then(() => {
+                  alert('Copied to clipboard! Paste it in your Instagram post.')
+                }).catch(() => {
+                  const textarea = document.createElement('textarea')
+                  textarea.value = shareText
+                  document.body.appendChild(textarea)
+                  textarea.select()
+                  document.execCommand('copy')
+                  document.body.removeChild(textarea)
+                  alert('Copied to clipboard! Paste it in your Instagram post.')
+                })
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+            </button>
+            <button
+              className="share-btn"
+              id="shareFacebook"
+              title="Share on Facebook"
+              onClick={() => {
+                const shareUrl = window.location.href
+                const fullText = `${profile.shareLine} - What Is Rich?`
+                const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(fullText)}`
+                window.open(url, '_blank', 'width=600,height=400')
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </button>
+            <button
+              className="share-btn"
+              id="shareTikTok"
+              title="Share on TikTok"
+              onClick={() => {
+                const shareText = `${profile.shareLine}\n\nExplore more: ${window.location.href}`
+                navigator.clipboard.writeText(shareText).then(() => {
+                  alert('Copied to clipboard! Paste it in your TikTok video description.')
+                }).catch(() => {
+                  const textarea = document.createElement('textarea')
+                  textarea.value = shareText
+                  document.body.appendChild(textarea)
+                  textarea.select()
+                  document.execCommand('copy')
+                  document.body.removeChild(textarea)
+                  alert('Copied to clipboard! Paste it in your TikTok video description.')
+                })
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+              </svg>
+            </button>
+            <button
+              className="share-btn"
+              id="shareLinkedIn"
+              title="Share on LinkedIn"
+              onClick={() => {
+                const shareUrl = window.location.href
+                const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`
+                window.open(url, '_blank', 'width=600,height=400')
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+            </button>
+            <button
+              className="share-btn"
+              id="shareX"
+              title="Share on X"
+              onClick={() => {
+                const shareUrl = window.location.href
+                const fullText = `${profile.shareLine} - What Is Rich?`
+                const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(fullText)}&url=${encodeURIComponent(shareUrl)}`
+                window.open(url, '_blank', 'width=600,height=400')
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+            </button>
           </div>
           <button className="close-share" onClick={() => setShowShareModal(false)}>
             Close
