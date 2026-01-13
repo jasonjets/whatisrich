@@ -428,19 +428,6 @@ export default function Home() {
         }}
       >
         <div className="cinematic-intro" onClick={handleIntroClick} onTouchStart={handleIntroClick} style={{ pointerEvents: 'auto' }}>
-          {/* Producer Credits - Top */}
-          <div className={`producer-credits-top ${introAnimated ? 'visible' : ''}`}>
-            <div className="producer-line">
-              <span className="producer-label">PRODUCED BY</span>
-              <span className="producer-name-small">RUSHION MCDONALD</span>
-              <span className="producer-awards">2X EMMY | 3X NAACP IMAGE AWARD WINNER</span>
-            </div>
-            <div className="producer-line secondary">
-              <span className="producer-name-small">JEROME LOVE</span>
-              <span className="producer-awards">NAACP IMAGE AWARD WINNER</span>
-            </div>
-          </div>
-
           {/* Main Title - Centered & Dominant */}
           <div 
             className={`main-title-hero ${introAnimated ? 'visible' : ''}`} 
@@ -457,11 +444,20 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Additional Credits - Bottom */}
+          {/* Names Only - Bottom */}
           <div className={`producer-credits-bottom ${introAnimated ? 'visible' : ''}`}>
-            <div className="credit-line">HOST, SERIAL ENTREPRENEUR & COMMUNITY LEADER</div>
-            <div className="credit-line">CEO & FOUNDER OF TEXAS BLACK EXPO</div>
-            <div className="credit-line small">The Largest African American Business Trade Show in the Southern U.S.</div>
+            <div className="credit-line" style={{ 
+              fontSize: '0.65rem', 
+              letterSpacing: '0.15em',
+              marginBottom: '1.5rem',
+              opacity: 0.7,
+              fontWeight: '300',
+              textTransform: 'uppercase'
+            }}>
+              A docuseries redefining wealth, ownership, and the American dream
+            </div>
+            <div className="credit-line" style={{ fontSize: '0.9rem', marginBottom: '0.3rem' }}>RUSHION MCDONALD</div>
+            <div className="credit-line" style={{ fontSize: '1.1rem', fontWeight: '500' }}>JEROME LOVE</div>
           </div>
         </div>
       </div>
