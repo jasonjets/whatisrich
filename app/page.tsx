@@ -5,13 +5,13 @@ import ParticleBackground from './components/ParticleBackground'
 
 // Data
 const analysisData = [
-  { icon: '💎', title: 'Material Abundance', keywords: ['money', 'cash', 'wealthy', 'millionaire', 'billionaire', 'buy', 'afford', 'expensive', 'luxury'], text: 'Your answer touches on financial wealth. In our documentary, we explore how material abundance shapes our lives in unexpected ways.' },
+  { icon: '💎', title: 'Material Abundance', keywords: ['money', 'cash', 'wealthy', 'millionaire', 'billionaire', 'buy', 'afford', 'expensive', 'luxury'], text: 'Your answer touches on financial wealth. In our docuseries, we explore how material abundance shapes our lives in unexpected ways.' },
   { icon: '❤️', title: 'Human Connection', keywords: ['family', 'friends', 'love', 'people', 'relationship', 'together', 'children', 'partner', 'community'], text: 'Relationships define your richness. Research confirms what you intuitively know: our bonds predict our wellbeing.' },
-  { icon: '⏳', title: 'Time & Freedom', keywords: ['time', 'freedom', 'free', 'choice', 'flexible', 'control', 'retire', 'travel', 'independence'], text: 'Time is your true currency. The documentary features voices who traded fortunes for freedom—and never looked back.' },
+  { icon: '⏳', title: 'Time & Freedom', keywords: ['time', 'freedom', 'free', 'choice', 'flexible', 'control', 'retire', 'travel', 'independence'], text: 'Time is your true currency. The docuseries features voices who traded fortunes for freedom—and never looked back.' },
   { icon: '🌱', title: 'Health & Vitality', keywords: ['health', 'healthy', 'peace', 'mind', 'body', 'energy', 'alive', 'wellness', 'balance'], text: 'Health as wealth—a perspective that crystallizes with age. We met people who lost everything yet felt rich with their health intact.' },
-  { icon: '🎯', title: 'Purpose & Meaning', keywords: ['purpose', 'meaning', 'impact', 'help', 'change', 'matter', 'legacy', 'mission', 'difference'], text: 'Purpose is your measure. The film explores how meaning transforms everything—from prison cells to corner offices.' },
+  { icon: '🎯', title: 'Purpose & Meaning', keywords: ['purpose', 'meaning', 'impact', 'help', 'change', 'matter', 'legacy', 'mission', 'difference'], text: 'Purpose is your measure. The docuseries explores how meaning transforms everything—from prison cells to corner offices.' },
   { icon: '✨', title: 'Experience & Growth', keywords: ['experience', 'learn', 'grow', 'adventure', 'memories', 'moments', 'journey', 'discover', 'wisdom'], text: 'You measure wealth in experiences. We followed people who traded possessions for passports and found themselves richer.' },
-  { icon: '🙏', title: 'Gratitude & Presence', keywords: ['grateful', 'enough', 'happy', 'content', 'blessed', 'appreciate', 'simple', 'present', 'thankful'], text: 'Contentment is your compass. The documentary reveals how some with the least material wealth exhibit the greatest abundance.' },
+  { icon: '🙏', title: 'Gratitude & Presence', keywords: ['grateful', 'enough', 'happy', 'content', 'blessed', 'appreciate', 'simple', 'present', 'thankful'], text: 'Contentment is your compass. The docuseries reveals how some with the least material wealth exhibit the greatest abundance.' },
   { icon: '🔥', title: 'Passion & Creation', keywords: ['passion', 'create', 'art', 'music', 'build', 'make', 'dream', 'express', 'craft'], text: 'Creative expression defines your richness. We showcase artists who turned away from wealth to pursue their craft.' }
 ]
 
@@ -37,7 +37,7 @@ const profileTypes = [
     name: 'The Time Billionaire',
     subtitle: 'Time is the only real flex',
     traits: ['Hates being rushed', 'Optimizes life, not just money', 'Time-conscious', 'Freedom-focused'],
-    description: 'You understand that time is the ultimate currency. While others chase money, you\'ve optimized your life to maximize freedom and minimize obligations. The documentary explores how people around the world have traded traditional wealth for something you understand well: the luxury of time.',
+    description: 'You understand that time is the ultimate currency. While others chase money, you\'ve optimized your life to maximize freedom and minimize obligations. The docuseries explores how people around the world have traded traditional wealth for something you understand well: the luxury of time.',
     shareLine: "I'm rich in time."
   },
   {
@@ -231,35 +231,40 @@ export default function Home() {
     const depthValue = sliderValues.depth || 50
     const stabilityValue = sliderValues.stability || 50
 
-    // Map to new archetypes based on analysis and slider values
-    if (matchedAnalysis.some(a => a.title.includes('Time') || a.title.includes('Freedom'))) {
+    // Use the PRIMARY (highest-scoring) matched analysis to determine archetype
+    const primaryMatch = matchedAnalysis[0]?.title || ''
+
+    // Map primary analysis to archetype
+    if (primaryMatch.includes('Time') || primaryMatch.includes('Freedom')) {
       profileIndex = 0 // The Time Billionaire
-    } else if (matchedAnalysis.some(a => a.title.includes('Material') || a.title.includes('Abundance'))) {
+    } else if (primaryMatch.includes('Material') || primaryMatch.includes('Abundance')) {
       profileIndex = 1 // The Asset Alchemist
-    } else if (matchedAnalysis.some(a => a.title.includes('Connection'))) {
+    } else if (primaryMatch.includes('Connection')) {
       profileIndex = 2 // The Plug
-    } else if (matchedAnalysis.some(a => a.title.includes('Health') || a.title.includes('Vitality'))) {
+    } else if (primaryMatch.includes('Health') || primaryMatch.includes('Vitality')) {
       profileIndex = 3 // The Firewall
-    } else if (matchedAnalysis.some(a => a.title.includes('Experience') || a.title.includes('Growth'))) {
+    } else if (primaryMatch.includes('Experience') || primaryMatch.includes('Growth')) {
       profileIndex = 4 // The Visionary
-    } else if (matchedAnalysis.some(a => a.title.includes('Purpose') || a.title.includes('Meaning'))) {
+    } else if (primaryMatch.includes('Purpose') || primaryMatch.includes('Meaning')) {
       profileIndex = 5 // The Pillar
-    } else if (matchedAnalysis.some(a => a.title.includes('Passion') || a.title.includes('Creation'))) {
+    } else if (primaryMatch.includes('Passion') || primaryMatch.includes('Creation')) {
       profileIndex = 6 // The Catalyst
-    } else if (matchedAnalysis.some(a => a.title.includes('Gratitude') || a.title.includes('Presence'))) {
+    } else if (primaryMatch.includes('Gratitude') || primaryMatch.includes('Presence')) {
       profileIndex = 7 // The Aesthetic
     } else {
-      // Fallback based on slider values
-      if (timeValue > 70) {
+      // Fallback based on slider values when no clear match
+      if (timeValue > 60 && timeValue > securityValue) {
         profileIndex = 0 // The Time Billionaire
-      } else if (securityValue > 70) {
+      } else if (securityValue > 60) {
         profileIndex = 3 // The Firewall
-      } else if (recognitionValue > 70) {
+      } else if (stabilityValue < 40) {
+        profileIndex = 4 // The Visionary (adventure-leaning)
+      } else if (recognitionValue > 60) {
         profileIndex = 6 // The Catalyst
-      } else if (depthValue > 70) {
-        profileIndex = 4 // The Visionary
+      } else if (depthValue > 60) {
+        profileIndex = 2 // The Plug (depth in relationships)
       } else {
-        profileIndex = 5 // The Pillar (default)
+        profileIndex = 5 // The Pillar (balanced default)
       }
     }
 
@@ -290,7 +295,7 @@ export default function Home() {
       matched.push({
         icon: '🌟',
         title: 'Unique Vision',
-        text: 'Your definition defies easy categorization—which often signals the most profound perspectives. The documentary features voices who share your singular view.'
+        text: 'Your definition defies easy categorization—which often signals the most profound perspectives. The docuseries features voices who share your singular view.'
       })
     }
 
@@ -653,24 +658,18 @@ export default function Home() {
       {/* SCREEN 6: CTA */}
       <div className={`screen screen-cta ${currentScreen === 6 ? 'active' : ''} ${exitingScreen === 6 ? 'exit' : ''}`}>
         <div className="cta-wrapper">
-          <h2 className="cta-title">The Film Awaits</h2>
+          <h2 className="cta-title">The Docuseries Awaits</h2>
           <p className="cta-subtitle">
             You&apos;ve glimpsed your definition of rich. Now discover how people across the world answer the same question.
           </p>
 
           <div className="cta-buttons">
             <a href="https://www.whatisrichdoc.com/" className="cta-primary">
-              Explore the Documentary
+              Explore the Docuseries
             </a>
             <button className="cta-secondary" onClick={() => setShowShareModal(true)}>
               Share My Definition
             </button>
-          </div>
-
-          <div className="cta-links">
-            <a href="https://www.whatisrichdoc.com/" className="cta-link">Official Site</a>
-            <a href="#" className="cta-link">Instagram</a>
-            <a href="#" className="cta-link">Twitter</a>
           </div>
         </div>
       </div>
