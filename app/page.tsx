@@ -223,49 +223,99 @@ export default function Home() {
   }, [currentScreen, matchedAnalysis, sliderValues])
 
   const generateProfile = () => {
-    let profileIndex = 0
-
     const timeValue = sliderValues.time || 50
     const securityValue = sliderValues.security || 50
     const recognitionValue = sliderValues.recognition || 50
     const depthValue = sliderValues.depth || 50
     const stabilityValue = sliderValues.stability || 50
 
-    // Use the PRIMARY (highest-scoring) matched analysis to determine archetype
-    const primaryMatch = matchedAnalysis[0]?.title || ''
+    // Score each archetype based on ALL matched analyses and slider values
+    const archetypeScores = [0, 0, 0, 0, 0, 0, 0, 0]
 
-    // Map primary analysis to archetype
-    if (primaryMatch.includes('Time') || primaryMatch.includes('Freedom')) {
-      profileIndex = 0 // The Time Billionaire
-    } else if (primaryMatch.includes('Material') || primaryMatch.includes('Abundance')) {
-      profileIndex = 1 // The Asset Alchemist
-    } else if (primaryMatch.includes('Connection')) {
-      profileIndex = 2 // The Plug
-    } else if (primaryMatch.includes('Health') || primaryMatch.includes('Vitality')) {
-      profileIndex = 3 // The Firewall
-    } else if (primaryMatch.includes('Experience') || primaryMatch.includes('Growth')) {
-      profileIndex = 4 // The Visionary
-    } else if (primaryMatch.includes('Purpose') || primaryMatch.includes('Meaning')) {
-      profileIndex = 5 // The Pillar
-    } else if (primaryMatch.includes('Passion') || primaryMatch.includes('Creation')) {
-      profileIndex = 6 // The Catalyst
-    } else if (primaryMatch.includes('Gratitude') || primaryMatch.includes('Presence')) {
-      profileIndex = 7 // The Aesthetic
-    } else {
-      // Fallback based on slider values when no clear match
-      if (timeValue > 60 && timeValue > securityValue) {
-        profileIndex = 0 // The Time Billionaire
-      } else if (securityValue > 60) {
-        profileIndex = 3 // The Firewall
-      } else if (stabilityValue < 40) {
-        profileIndex = 4 // The Visionary (adventure-leaning)
-      } else if (recognitionValue > 60) {
-        profileIndex = 6 // The Catalyst
-      } else if (depthValue > 60) {
-        profileIndex = 2 // The Plug (depth in relationships)
-      } else {
-        profileIndex = 5 // The Pillar (balanced default)
+    // Analyze all matched insights (weighted by position - first match = 3 pts, second = 2 pts, third = 1 pt)
+    matchedAnalysis.forEach((analysis, index) => {
+      const weight = 3 - index
+      const title = analysis.title || ''
+
+      if (title.includes('Time') || title.includes('Freedom')) {
+        archetypeScores[0] += weight * 2 // The Time Billionaire
       }
+      if (title.includes('Material') || title.includes('Abundance')) {
+        archetypeScores[1] += weight * 2 // The Asset Alchemist
+      }
+      if (title.includes('Connection')) {
+        archetypeScores[2] += weight * 2 // The Plug
+      }
+      if (title.includes('Health') || title.includes('Vitality')) {
+        archetypeScores[3] += weight * 2 // The Firewall
+      }
+      if (title.includes('Experience') || title.includes('Growth')) {
+        archetypeScores[4] += weight * 2 // The Visionary
+      }
+      if (title.includes('Purpose') || title.includes('Meaning')) {
+        archetypeScores[5] += weight * 2 // The Pillar
+      }
+      if (title.includes('Passion') || title.includes('Creation')) {
+        archetypeScores[6] += weight * 2 // The Catalyst
+      }
+      if (title.includes('Gratitude') || title.includes('Presence')) {
+        archetypeScores[7] += weight * 2 // The Aesthetic
+      }
+    })
+
+    // Factor in slider values for nuanced selection
+    // Time > Money slider
+    if (timeValue > 65) {
+      archetypeScores[0] += 2 // Time Billionaire
+    } else if (timeValue < 35) {
+      archetypeScores[1] += 1 // Asset Alchemist (money-focused)
+    }
+
+    // Security > Freedom slider
+    if (securityValue > 65) {
+      archetypeScores[3] += 2 // The Firewall (security-focused)
+    } else if (securityValue < 35) {
+      archetypeScores[0] += 1 // Time Billionaire (freedom-focused)
+    }
+
+    // Stability > Adventure slider
+    if (stabilityValue > 65) {
+      archetypeScores[5] += 1 // The Pillar (stable foundation)
+    } else if (stabilityValue < 35) {
+      archetypeScores[4] += 2 // The Visionary (adventure-seeking)
+    }
+
+    // Depth > Breadth slider
+    if (depthValue > 65) {
+      archetypeScores[2] += 2 // The Plug (deep relationships)
+      archetypeScores[5] += 1 // The Pillar
+    } else if (depthValue < 35) {
+      archetypeScores[6] += 1 // The Catalyst (broad impact)
+    }
+
+    // Recognition > Peace slider
+    if (recognitionValue > 65) {
+      archetypeScores[6] += 2 // The Catalyst (drives change)
+      archetypeScores[7] += 1 // The Aesthetic (expression)
+    } else if (recognitionValue < 35) {
+      archetypeScores[3] += 1 // The Firewall (peace-focused)
+      archetypeScores[7] += 1 // The Aesthetic (inner peace)
+    }
+
+    // Find archetype with highest score
+    let profileIndex = 0
+    let maxScore = archetypeScores[0]
+    
+    archetypeScores.forEach((score, index) => {
+      if (score > maxScore) {
+        maxScore = score
+        profileIndex = index
+      }
+    })
+
+    // Default to The Pillar if all scores are very low (balanced personality)
+    if (maxScore < 2) {
+      profileIndex = 5
     }
 
     setProfile(profileTypes[profileIndex])
