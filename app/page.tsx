@@ -423,47 +423,40 @@ export default function Home() {
         }}
       >
         <div className="cinematic-intro" onClick={handleIntroClick} onTouchStart={handleIntroClick} style={{ pointerEvents: 'auto' }}>
-          {/* Producer Credits */}
-          <div className={`producer-credits ${introAnimated ? 'visible' : ''}`}>
-            <div className="producer-block">
-              <div className="producer-presents">PRODUCED BY</div>
-              <div className="producer-name">RUSHION MCDONALD</div>
-              <div className="producer-accolades">
-                <div className="accolade">2X EMMY AWARD WINNER</div>
-                <div className="accolade">3X NAACP IMAGE AWARD WINNER</div>
-                <div className="accolade-divider"></div>
-                <div className="accolade-role">HOST, SERIAL ENTREPRENEUR & COMMUNITY LEADER</div>
-                <div className="accolade-detail">CEO & FOUNDER OF TEXAS BLACK EXPO</div>
-                <div className="accolade-subdetail">The Largest African American Business Trade Show in the Southern U.S.</div>
-              </div>
+          {/* Producer Credits - Top */}
+          <div className={`producer-credits-top ${introAnimated ? 'visible' : ''}`}>
+            <div className="producer-line">
+              <span className="producer-label">PRODUCED BY</span>
+              <span className="producer-name-small">RUSHION MCDONALD</span>
+              <span className="producer-awards">2X EMMY | 3X NAACP IMAGE AWARD WINNER</span>
             </div>
-
-            <div className="producer-divider"></div>
-
-            <div className="producer-block secondary">
-              <div className="producer-name secondary">JEROME LOVE</div>
-              <div className="producer-accolades">
-                <div className="accolade">NAACP IMAGE AWARD WINNER</div>
-              </div>
+            <div className="producer-line secondary">
+              <span className="producer-name-small">JEROME LOVE</span>
+              <span className="producer-awards">NAACP IMAGE AWARD WINNER</span>
             </div>
           </div>
 
-          {/* Main Title */}
-          <div className={`main-title-block ${introAnimated ? 'visible' : ''}`}>
-            <div className="title-ornament top"></div>
-            <h1 className="cinematic-title">
-              <span className="title-what">What Is</span>
-              <span className="title-rich">Rich</span>
-              <span className="title-question">?</span>
-            </h1>
-            <div className="title-ornament bottom"></div>
-            <div className="title-tagline">A Cinematic Exploration</div>
+          {/* Main Title - Centered & Dominant */}
+          <div 
+            className={`main-title-hero ${introAnimated ? 'visible' : ''}`} 
+            onClick={handleIntroClick} 
+            onTouchStart={handleIntroClick}
+          >
+            <h1 className="hero-title" onClick={handleIntroClick} onTouchStart={handleIntroClick}>WHAT IS RICH?</h1>
+            <div className="title-underline"></div>
+            
+            {/* Call to Action directly under title */}
+            <div className={`cinematic-cta-inline ${introAnimated ? 'visible' : ''}`}>
+              <div className="cta-pulse"></div>
+              <div className="cta-text">TAP TO BEGIN</div>
+            </div>
           </div>
 
-          {/* Call to Action */}
-          <div className={`cinematic-cta ${introAnimated ? 'visible' : ''}`}>
-            <div className="cta-pulse"></div>
-            <div className="cta-text">TAP TO BEGIN YOUR JOURNEY</div>
+          {/* Additional Credits - Bottom */}
+          <div className={`producer-credits-bottom ${introAnimated ? 'visible' : ''}`}>
+            <div className="credit-line">HOST, SERIAL ENTREPRENEUR & COMMUNITY LEADER</div>
+            <div className="credit-line">CEO & FOUNDER OF TEXAS BLACK EXPO</div>
+            <div className="credit-line small">The Largest African American Business Trade Show in the Southern U.S.</div>
           </div>
         </div>
       </div>
