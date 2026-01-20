@@ -77,9 +77,43 @@ body.scrollable {
    SCREEN 0: CINEMATIC INTRO
 ========================================== */
 .screen-intro {
-  background: radial-gradient(ellipse at center, #0a0a0a 0%, #000000 100%);
+  background: #000000;
   cursor: pointer;
   overflow: hidden;
+  position: relative;
+}
+
+/* Textured dark background with subtle noise */
+.screen-intro::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(ellipse at center bottom, rgba(139, 90, 43, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at center, rgba(20, 18, 15, 1) 0%, rgba(5, 5, 5, 1) 100%);
+  pointer-events: none;
+}
+
+/* Golden light burst from center bottom */
+.screen-intro::after {
+  content: '';
+  position: absolute;
+  bottom: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 60%;
+  background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.25) 0%, rgba(180, 140, 40, 0.1) 25%, transparent 60%);
+  pointer-events: none;
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
 }
 
 .cinematic-intro {
@@ -186,26 +220,47 @@ body.scrollable {
   font-family: var(--font-space), sans-serif;
   font-size: clamp(3.5rem, 15vw, 11rem);
   font-weight: 900;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   line-height: 0.9;
-  color: var(--gold);
   text-transform: uppercase;
-  text-shadow: 0 0 60px rgba(212, 175, 55, 0.4);
   margin: 0;
   cursor: pointer;
   pointer-events: auto;
   transition: transform 0.3s ease;
+  /* Metallic gold gradient with embossed 3D effect */
+  background: linear-gradient(
+    180deg,
+    #c9a227 0%,
+    #f5e7a3 15%,
+    #d4af37 30%,
+    #c9a227 45%,
+    #8b6914 55%,
+    #5c4a1f 70%,
+    #8b6914 85%,
+    #c9a227 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  /* Multiple shadows for depth and glow */
+  filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.4))
+          drop-shadow(0 4px 8px rgba(0, 0, 0, 0.8))
+          drop-shadow(0 2px 4px rgba(139, 105, 20, 0.5));
+  position: relative;
 }
 
 .hero-title:hover {
   transform: scale(1.02);
+  filter: drop-shadow(0 0 50px rgba(212, 175, 55, 0.6))
+          drop-shadow(0 4px 8px rgba(0, 0, 0, 0.8))
+          drop-shadow(0 2px 4px rgba(139, 105, 20, 0.5));
 }
 
 .title-underline {
-  width: 200px;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  margin-top: 2rem;
+  width: 300px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(212, 175, 55, 0.3) 20%, rgba(245, 231, 163, 0.8) 50%, rgba(212, 175, 55, 0.3) 80%, transparent 100%);
+  margin-top: 1.5rem;
   position: relative;
   opacity: 0;
   animation: underlineGrow 1.5s ease 1.5s forwards;
@@ -217,29 +272,35 @@ body.scrollable {
     opacity: 0;
   }
   to {
-    width: 200px;
+    width: 300px;
     opacity: 1;
   }
 }
 
-.title-underline::before,
+/* Central glow spot on underline */
+.title-underline::before {
+  content: '';
+  position: absolute;
+  width: 80px;
+  height: 60px;
+  background: radial-gradient(ellipse at center, rgba(245, 231, 163, 0.6) 0%, rgba(212, 175, 55, 0.2) 40%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
 .title-underline::after {
   content: '';
   position: absolute;
   width: 6px;
   height: 6px;
-  background: var(--gold);
+  background: radial-gradient(circle, #f5e7a3 0%, #d4af37 100%);
   border-radius: 50%;
   top: 50%;
-  transform: translateY(-50%);
-}
-
-.title-underline::before {
-  left: -15px;
-}
-
-.title-underline::after {
-  right: -15px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 15px rgba(245, 231, 163, 0.8);
 }
 
 /* Producer Credits - Bottom */
@@ -274,6 +335,60 @@ body.scrollable {
   line-height: 1.6;
 }
 
+/* Tagline with metallic gold styling */
+.credit-line.tagline {
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  font-weight: 400;
+  background: linear-gradient(
+    180deg,
+    #c9a227 0%,
+    #f5e7a3 30%,
+    #d4af37 50%,
+    #c9a227 70%,
+    #8b6914 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  margin-bottom: 1.5rem;
+  opacity: 1;
+}
+
+/* Credits row - HOSTED BY / DIRECTED BY format */
+.credits-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-space), sans-serif;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.credits-row strong {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+
+.credits-divider {
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 300;
+}
+
+.website-url {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: var(--font-space), sans-serif;
+}
+
 .credit-line.small {
   font-size: 0.55rem;
   letter-spacing: 0.15em;
@@ -284,9 +399,9 @@ body.scrollable {
 
 /* Cinematic CTA - Inline with title */
 .cinematic-cta-inline {
-  margin-top: 3rem;
+  margin-top: 2.5rem;
   opacity: 0;
-  animation: ctaAppear 2s ease 2s forwards;
+  animation: ctaAppear 2s ease 2.5s forwards;
   position: relative;
   cursor: pointer;
   pointer-events: auto;
@@ -306,9 +421,9 @@ body.scrollable {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 100px;
-  height: 100px;
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  width: 80px;
+  height: 80px;
+  border: 1px solid rgba(212, 175, 55, 0.15);
   border-radius: 50%;
   animation: pulseRing 3s ease-in-out infinite;
   pointer-events: none;
@@ -320,7 +435,7 @@ body.scrollable {
     opacity: 0;
   }
   50% {
-    opacity: 0.3;
+    opacity: 0.25;
   }
   100% {
     transform: translate(-50%, -50%) scale(2);
@@ -329,24 +444,33 @@ body.scrollable {
 }
 
 .cta-text {
-  font-size: 0.65rem;
-  letter-spacing: 0.4em;
+  font-size: 0.6rem;
+  letter-spacing: 0.5em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
   font-family: var(--font-space), sans-serif;
   position: relative;
   z-index: 2;
-  animation: ctaGlow 2s ease-in-out infinite;
+  animation: ctaGlow 3s ease-in-out infinite;
   padding: 0.5rem 1rem;
   cursor: pointer;
+  /* Subtle gold gradient text */
+  background: linear-gradient(
+    180deg,
+    rgba(212, 175, 55, 0.6) 0%,
+    rgba(245, 231, 163, 0.8) 50%,
+    rgba(212, 175, 55, 0.6) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 @keyframes ctaGlow {
   0%, 100% {
-    color: rgba(255,255,255,0.5);
+    opacity: 0.5;
   }
   50% {
-    color: rgba(212, 175, 55, 0.9);
+    opacity: 1;
   }
 }
 
@@ -1367,6 +1491,25 @@ body.scrollable {
   transform: translateY(-3px);
 }
 
+.download-image-btn {
+  background: var(--gold);
+  border: none;
+  color: var(--black);
+  padding: 0.75rem 2rem;
+  font-family: var(--font-space), sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.download-image-btn:hover {
+  background: var(--white);
+  transform: translateY(-2px);
+}
+
 .close-share {
   background: transparent;
   border: 1px solid rgba(255,255,255,0.3);
@@ -1478,7 +1621,28 @@ body.scrollable {
   }
 
   .title-underline {
-    width: 150px;
+    width: 200px;
+  }
+
+  @keyframes underlineGrow {
+    to {
+      width: 200px;
+      opacity: 1;
+    }
+  }
+
+  .credit-line.tagline {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+  }
+
+  .credits-row {
+    font-size: 0.55rem;
+    gap: 0.5rem;
+  }
+
+  .website-url {
+    font-size: 0.6rem;
   }
 
   .credit-line {
@@ -1523,11 +1687,39 @@ body.scrollable {
   }
 
   .title-underline {
-    width: 120px;
+    width: 150px;
+  }
+
+  @keyframes underlineGrow {
+    to {
+      width: 150px;
+      opacity: 1;
+    }
   }
 
   .credit-line {
     font-size: 0.5rem;
+  }
+
+  .credit-line.tagline {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+  }
+
+  .credits-row {
+    font-size: 0.5rem;
+    gap: 0.4rem;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .credits-divider {
+    display: none;
+  }
+
+  .website-url {
+    font-size: 0.55rem;
+    margin-top: 0.5rem;
   }
 
   .credit-line.small {

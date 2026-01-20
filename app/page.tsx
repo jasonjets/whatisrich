@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import html2canvas from 'html2canvas'
 import ParticleBackground from './components/ParticleBackground'
 
 // Data
@@ -113,6 +114,97 @@ interface AnalysisItem {
   score?: number
 }
 
+interface ProfileType {
+  name: string
+  subtitle: string
+  traits: string[]
+  description: string
+  shareLine: string
+}
+
+// Share Image Component
+const ShareImage = React.forwardRef<HTMLDivElement, { profile: ProfileType }>(
+  ({ profile }, ref) => {
+    const orbitStyle = (size: string, top: string, left: string, borderColor: string, duration: string, reverse = false): React.CSSProperties => ({
+      position: 'absolute',
+      width: size,
+      height: size,
+      top,
+      left,
+      border: `1px solid ${borderColor}`,
+      borderRadius: '50%',
+      animation: `orbit ${duration} linear infinite ${reverse ? 'reverse' : ''}`,
+    })
+
+    const orbitDotStyle: React.CSSProperties = {
+      position: 'absolute',
+      width: '8px',
+      height: '8px',
+      background: '#d4af37',
+      borderRadius: '50%',
+      top: '-4px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+    }
+
+    return (
+      <div
+        ref={ref}
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          width: '600px',
+          height: '600px',
+          background: 'linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: 'system-ui, sans-serif',
+        }}
+      >
+        {/* Title */}
+        <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.2em', marginBottom: '30px' }}>
+          WHAT IS RICH?
+        </div>
+
+        {/* Orbit visualization */}
+        <div style={{ position: 'relative', width: '240px', height: '240px' }}>
+          <div style={orbitStyle('100%', '0', '0', 'rgba(212, 175, 55, 0.2)', '20s')}>
+            <div style={orbitDotStyle} />
+          </div>
+          <div style={orbitStyle('70%', '15%', '15%', 'rgba(212, 175, 55, 0.4)', '15s', true)}>
+            <div style={orbitDotStyle} />
+          </div>
+          <div style={orbitStyle('40%', '30%', '30%', '#d4af37', '10s')}>
+            <div style={orbitDotStyle} />
+          </div>
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+            <div style={{ fontSize: '22px', color: '#d4af37', whiteSpace: 'nowrap' }}>{profile.name}</div>
+            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', marginTop: '4px' }}>{profile.subtitle}</div>
+          </div>
+        </div>
+
+        {/* Share line */}
+        <div style={{ marginTop: '30px', fontSize: '16px', color: 'rgba(255,255,255,0.8)', fontStyle: 'italic' }}>
+          &ldquo;{profile.shareLine}&rdquo;
+        </div>
+
+        {/* Credits */}
+        <div style={{ marginTop: '35px', fontSize: '9px', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.5)' }}>
+          HOSTED BY JEROME D. LOVE&nbsp;&nbsp;|&nbsp;&nbsp;DIRECTED BY RUSHION McDONALD
+        </div>
+
+        {/* Website URL - Prominent */}
+        <div style={{ marginTop: '15px', fontSize: '18px', fontWeight: '700', letterSpacing: '0.1em', color: '#d4af37' }}>
+          WWW.WHATISRICHDOC.COM
+        </div>
+      </div>
+    )
+  }
+)
+ShareImage.displayName = 'ShareImage'
+
 export default function Home() {
   const [currentScreen, setCurrentScreen] = useState(0)
   const [exitingScreen, setExitingScreen] = useState<number | null>(null)
@@ -137,6 +229,56 @@ export default function Home() {
   const perspectiveIntervalRef = useRef<NodeJS.Timeout>()
   const activeSliderRef = useRef<string | null>(null)
   const isTransitioningRef = useRef(false)
+  const shareImageRef = useRef<HTMLDivElement>(null)
+
+  // Share archetype image - uses native share on mobile, clipboard/download on desktop
+  const shareArchetypeImage = async () => {
+    if (!shareImageRef.current) return
+    try {
+      const canvas = await html2canvas(shareImageRef.current, {
+        backgroundColor: '#0a0a0a',
+        scale: 2,
+      })
+
+      // Convert canvas to blob
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((b) => b ? resolve(b) : reject(new Error('Failed to create blob')), 'image/png')
+      })
+
+      const file = new File([blob], 'my-wealth-archetype.png', { type: 'image/png' })
+
+      // Try Web Share API first (works great on mobile)
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'My Wealth Archetype',
+          text: profile.shareLine,
+        })
+        return
+      }
+
+      // Try clipboard copy (desktop)
+      if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ])
+          alert('Image copied to clipboard!')
+          return
+        } catch {
+          // Clipboard failed, fall through to download
+        }
+      }
+
+      // Fallback: download
+      const link = document.createElement('a')
+      link.download = 'my-wealth-archetype.png'
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    } catch (err) {
+      console.error('Failed to share image:', err)
+    }
+  }
 
   // Show screen with exit animation
   const showScreen = useCallback((num: number) => {
@@ -494,20 +636,17 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Names Only - Bottom */}
+          {/* Tagline & Credits - Bottom */}
           <div className={`producer-credits-bottom ${introAnimated ? 'visible' : ''}`}>
-            <div className="credit-line" style={{ 
-              fontSize: '0.65rem', 
-              letterSpacing: '0.15em',
-              marginBottom: '1.5rem',
-              opacity: 0.7,
-              fontWeight: '300',
-              textTransform: 'uppercase'
-            }}>
-              A docuseries redefining wealth, ownership, and the American dream
+            <div className="credit-line tagline">
+              A docuseries redefining wealth, ownership,<br />and the American dream.
             </div>
-            <div className="credit-line" style={{ fontSize: '0.9rem', marginBottom: '0.3rem' }}>RUSHION MCDONALD</div>
-            <div className="credit-line" style={{ fontSize: '1.1rem', fontWeight: '500' }}>JEROME LOVE</div>
+            <div className="credits-row">
+              <span>HOSTED BY <strong>JEROME D. LOVE</strong></span>
+              <span className="credits-divider">|</span>
+              <span>DIRECTED BY <strong>RUSHION McDONALD</strong></span>
+            </div>
+            <div className="website-url">WWW.WHATISRICHDOC.COM</div>
           </div>
         </div>
       </div>
@@ -822,11 +961,17 @@ export default function Home() {
               </svg>
             </button>
           </div>
+          <button className="download-image-btn" onClick={shareArchetypeImage}>
+            Share Image
+          </button>
           <button className="close-share" onClick={() => setShowShareModal(false)}>
             Close
           </button>
         </div>
       </div>
+
+      {/* Hidden share image for capture */}
+      <ShareImage ref={shareImageRef} profile={profile} />
     </>
   )
 }
