@@ -25,12 +25,13 @@ const sliderData = [
 ]
 
 const perspectivesData = [
-  { quote: "I had fifty million and felt empty. Now I have enough, and I have everything.", author: "Former Tech CEO", context: "Silicon Valley" },
-  { quote: "Rich is watching my grandchildren play in the fields I played in as a child.", author: "Farmer", context: "Rural Japan" },
-  { quote: "When you survive what I survived, breathing is rich. Walking is rich.", author: "Refugee", context: "Originally Syria" },
-  { quote: "I measure wealth in the number of lives I've changed.", author: "Teacher", context: "Chicago" },
-  { quote: "Rich is having options. Not diamonds—options.", author: "Entrepreneur", context: "Lagos, Nigeria" },
-  { quote: "True wealth? Not needing to check the price—or the time.", author: "Investor", context: "Monaco" }
+  { quote: "The real key to building wealth is knowing that you deserve a seat at the table, you deserve to be in the room, and you have the power to create.", author: "Ashley M. Fox", context: "" },
+  { quote: "The key to having money is simple, spend less than you make.", author: "John D. Love", context: "" },
+  { quote: "Don't eat your seed, eat your fruit.", author: "Jerome D. Love", context: "" },
+  { quote: "When a community can depend on itself, that's how I define rich.", author: "Marcus Davis", context: "The Breakfast Klub" },
+  { quote: "Rich is less about a number and more about living in alignment with my values.", author: "Jonathan Sprinkles", context: "" },
+  { quote: "I'm rich in spirit, rich in family, and rich in friends—that's what led to me to materialistic success.", author: "Will Packer", context: "" },
+  { quote: "Wealth to me is infinite. It keeps going down through generations.", author: "Isaac Hayes", context: "CEO, Fanbase" }
 ]
 
 const profileTypes = [

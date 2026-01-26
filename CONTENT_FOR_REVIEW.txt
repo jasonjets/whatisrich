@@ -1,0 +1,316 @@
+================================================================================
+                     WHAT IS RICH? - COMPLETE TEXT CONTENT
+                         For Owner Review and Approval
+================================================================================
+
+This document contains ALL text content from the interactive experience.
+Please review, edit, and approve each section.
+
+================================================================================
+                              BRANDING & CREDITS
+================================================================================
+
+Main Title: WHAT IS RICH?
+Tagline: A docuseries redefining wealth, ownership, and the American dream.
+Host: JEROME D. LOVE
+Director: RUSHION McDONALD
+Website URL: WWW.WHATISRICHDOC.COM
+
+
+================================================================================
+                            NAVIGATION LABELS
+================================================================================
+
+Screen 0: Begin
+Screen 1: Define
+Screen 2: Reflect
+Screen 3: Explore
+Screen 4: Discover
+Screen 5: Profile
+Screen 6: Continue
+
+
+================================================================================
+                    SCREEN 0: INTRODUCTION (TAP TO BEGIN)
+================================================================================
+
+Title: WHAT IS RICH?
+Call to Action: TAP TO BEGIN
+Tagline: A docuseries redefining wealth, ownership, and the American dream.
+Credits Line 1: HOSTED BY JEROME D. LOVE
+Credits Line 2: DIRECTED BY RUSHION McDONALD
+Website: WWW.WHATISRICHDOC.COM
+
+
+================================================================================
+                       SCREEN 1: USER INPUT
+================================================================================
+
+Main Prompt: To you, what does rich mean?
+Input Placeholder: Type your answer...
+Hint Text: Type your own or choose below
+Suggestions Label: Or select a perspective
+Divider Text: or type your own above
+Submit Button: Reveal My Rich
+
+--- SUGGESTION CHIPS (12 options) ---
+
+1. Label: Freedom & Time
+   Full Answer: having freedom to spend my time however I want
+
+2. Label: Love & Family
+   Full Answer: being surrounded by people who love me
+
+3. Label: Financial Security
+   Full Answer: having enough money to never worry
+
+4. Label: Health & Peace
+   Full Answer: good health and peace of mind
+
+5. Label: Purpose & Impact
+   Full Answer: doing work that matters and makes a difference
+
+6. Label: Experiences & Adventure
+   Full Answer: experiencing life to the fullest
+
+7. Label: Gratitude & Contentment
+   Full Answer: being content with what I have
+
+8. Label: Creation & Legacy
+   Full Answer: creating something meaningful
+
+9. Label: Options & Opportunity
+   Full Answer: having options and choices in life
+
+10. Label: Independence
+    Full Answer: independence and not answering to anyone
+
+11. Label: Joy & Fulfillment
+    Full Answer: waking up excited about the day ahead
+
+12. Label: Generosity & Giving
+    Full Answer: being able to help others
+
+
+================================================================================
+                      SCREEN 2: REVEAL (ANALYSIS)
+================================================================================
+
+Section Header: You said rich is
+Message Template: When you say rich is "[user's answer]", you join a conversation spanning centuries. In What Is Rich?, we asked this question across 12 countries—billionaires and monks, CEOs and children. What we found will resonate with your answer.
+Continue Button: Go Deeper
+
+--- ANALYSIS CATEGORIES (8 total) ---
+
+1. MATERIAL ABUNDANCE
+   Icon: Diamond
+   Keywords: money, cash, wealthy, millionaire, billionaire, buy, afford, expensive, luxury
+   Description: Your answer touches on financial wealth. In our docuseries, we explore how material abundance shapes our lives in unexpected ways.
+
+2. HUMAN CONNECTION
+   Icon: Heart
+   Keywords: family, friends, love, people, relationship, together, children, partner, community
+   Description: Relationships define your richness. Research confirms what you intuitively know: our bonds predict our wellbeing.
+
+3. TIME & FREEDOM
+   Icon: Hourglass
+   Keywords: time, freedom, free, choice, flexible, control, retire, travel, independence
+   Description: Time is your true currency. The docuseries features voices who traded fortunes for freedom—and never looked back.
+
+4. HEALTH & VITALITY
+   Icon: Seedling
+   Keywords: health, healthy, peace, mind, body, energy, alive, wellness, balance
+   Description: Health as wealth—a perspective that crystallizes with age. We met people who lost everything yet felt rich with their health intact.
+
+5. PURPOSE & MEANING
+   Icon: Target
+   Keywords: purpose, meaning, impact, help, change, matter, legacy, mission, difference
+   Description: Purpose is your measure. The docuseries explores how meaning transforms everything—from prison cells to corner offices.
+
+6. EXPERIENCE & GROWTH
+   Icon: Sparkles
+   Keywords: experience, learn, grow, adventure, memories, moments, journey, discover, wisdom
+   Description: You measure wealth in experiences. We followed people who traded possessions for passports and found themselves richer.
+
+7. GRATITUDE & PRESENCE
+   Icon: Praying Hands
+   Keywords: grateful, enough, happy, content, blessed, appreciate, simple, present, thankful
+   Description: Contentment is your compass. The docuseries reveals how some with the least material wealth exhibit the greatest abundance.
+
+8. PASSION & CREATION
+   Icon: Fire
+   Keywords: passion, create, art, music, build, make, dream, express, craft
+   Description: Creative expression defines your richness. We showcase artists who turned away from wealth to pursue their craft.
+
+--- FALLBACK (when no keywords match) ---
+
+UNIQUE VISION
+Icon: Star
+Description: Your definition defies easy categorization—which often signals the most profound perspectives. The docuseries features voices who share your singular view.
+
+
+================================================================================
+                      SCREEN 3: SPECTRUM SLIDERS
+================================================================================
+
+Section Title: The Dimensions of Rich
+Subtitle: Drag the handles to explore what matters most to you
+Continue Button: See Perspectives
+
+--- SLIDER PAIRS (5 total) ---
+
+1. Security <-----> Freedom
+2. Time <-----> Money
+3. Depth <-----> Breadth
+4. Stability <-----> Adventure
+5. Recognition <-----> Peace
+
+--- SLIDER VALUE LABELS ---
+When slider < 35%: "Leaning [left option]"
+When slider > 65%: "Leaning [right option]"
+When slider 35-65%: "Balanced"
+
+
+================================================================================
+                      SCREEN 4: PERSPECTIVES (QUOTES)
+================================================================================
+
+Section Title: Voices on Rich
+Continue Button: See Your Profile
+
+--- QUOTES (6 total) ---
+
+1. "I had fifty million and felt empty. Now I have enough, and I have everything."
+   - Former Tech CEO, Silicon Valley
+
+2. "Rich is watching my grandchildren play in the fields I played in as a child."
+   - Farmer, Rural Japan
+
+3. "When you survive what I survived, breathing is rich. Walking is rich."
+   - Refugee, Originally Syria
+
+4. "I measure wealth in the number of lives I've changed."
+   - Teacher, Chicago
+
+5. "Rich is having options. Not diamonds—options."
+   - Entrepreneur, Lagos, Nigeria
+
+6. "True wealth? Not needing to check the price—or the time."
+   - Investor, Monaco
+
+
+================================================================================
+                    SCREEN 5: WEALTH ARCHETYPES (PROFILES)
+================================================================================
+
+Section Title: Your Wealth Archetype
+Continue Button: Complete Journey
+
+--- ARCHETYPE PROFILES (8 total) ---
+
+1. THE TIME BILLIONAIRE
+   Subtitle: Time is the only real flex
+   Traits: Hates being rushed, Optimizes life not just money, Time-conscious, Freedom-focused
+   Description: You understand that time is the ultimate currency. While others chase money, you've optimized your life to maximize freedom and minimize obligations. The docuseries explores how people around the world have traded traditional wealth for something you understand well: the luxury of time.
+   Share Line: "I'm rich in time."
+
+2. THE ASSET ALCHEMIST
+   Subtitle: Turns effort into ownership
+   Traits: Sees assets everywhere, Thinks in leverage not labor, Builds systems, Ownership-minded
+   Description: You see opportunities to convert work into lasting value. Where others see jobs, you see assets. You think in systems, leverage, and ownership—turning every effort into something that works for you long-term.
+   Share Line: "I turn work into wealth."
+
+3. THE PLUG
+   Subtitle: Access beats money
+   Traits: Always knows who to call, Power through relationships, Network-focused, Connection-driven
+   Description: Your wealth lives in your relationships. You understand that the right connection at the right time is worth more than any amount of money. Your network isn't just contacts—it's your infrastructure.
+   Share Line: "My network is my net worth."
+
+4. THE FIREWALL
+   Subtitle: Wealth protects peace
+   Traits: Low drama high margin, Emergency-ready, Stress-resistant, Security-focused
+   Description: You've built wealth as a buffer against chaos. Financial security isn't about showing off—it's about creating a life where emergencies can't touch your peace. You sleep well because you're prepared.
+   Share Line: "Nothing can touch my peace."
+
+5. THE VISIONARY
+   Subtitle: Wealth is seeing first
+   Traits: Early mover, Invests before it's obvious, Forward-thinking, Trend-spotting
+   Description: You see value before others do. While the crowd follows trends, you're already moving to the next opportunity. Your wealth comes from recognizing patterns, timing, and potential that others miss.
+   Share Line: "I see it before it's valuable."
+
+6. THE PILLAR
+   Subtitle: Others depend on me
+   Traits: Family anchor, Team foundation, Community support, Responsibility-driven
+   Description: Your wealth is measured by the people who count on you. You build not just for yourself, but as the foundation others can stand on. Being reliable, stable, and dependable is your form of richness.
+   Share Line: "I'm the foundation."
+
+7. THE CATALYST
+   Subtitle: Money accelerates change
+   Traits: Funds ideas, Supports people, Drives movements, Momentum-focused
+   Description: You use wealth as fuel for transformation. Money isn't the goal—it's the tool that lets you fund ideas, support people, and drive movements. You thrive on momentum and making things happen.
+   Share Line: "I make things happen."
+
+8. THE AESTHETIC
+   Subtitle: Wealth should look and feel good
+   Traits: Design-focused, Lifestyle-driven, Experience-rich, Expressive
+   Description: You believe wealth should be beautiful. It's not shallow—it's expressive. You invest in design, experiences, and lifestyle because how your life looks and feels matters. Your environment reflects your values.
+   Share Line: "My life reflects my taste."
+
+
+================================================================================
+                    SCREEN 6: FINAL CALL TO ACTION
+================================================================================
+
+Title: The Docuseries Awaits
+Subtitle: You've glimpsed your definition of rich. Now discover how people across the world answer the same question.
+Primary Button: Explore the Docuseries
+Secondary Button: Share My Definition
+Primary Button Link: https://www.whatisrichdoc.com/
+
+
+================================================================================
+                           SHARE MODAL
+================================================================================
+
+Modal Title: Share Your Rich
+Share Card Text: "[Profile's share line]"
+Share Platforms: Instagram, Facebook, TikTok, LinkedIn, X (Twitter)
+Download Button: Share Image
+Close Button: Close
+
+--- SHARE BUTTON MESSAGES ---
+Instagram: "Copied to clipboard! Paste it in your Instagram post."
+TikTok: "Copied to clipboard! Paste it in your TikTok video description."
+
+
+================================================================================
+                         SHARE IMAGE TEXT
+================================================================================
+
+Header: WHAT IS RICH?
+Profile Name: [Dynamic - user's archetype name]
+Profile Subtitle: [Dynamic - user's archetype subtitle]
+Quote: "[Profile's share line]"
+Credits: HOSTED BY JEROME D. LOVE | DIRECTED BY RUSHION McDONALD
+Website: WWW.WHATISRICHDOC.COM
+
+
+================================================================================
+                           PAGE METADATA
+================================================================================
+
+Browser Tab Title: What Is Rich?
+Meta Description: An interactive exploration of what richness means to you
+
+
+================================================================================
+                         END OF DOCUMENT
+================================================================================
+
+Notes for review:
+- All text is organized by the screen/section where it appears
+- Keywords in analysis categories trigger when users type matching words
+- Share lines are displayed on social media when users share their results
+- The website URL (whatisrichdoc.com) appears multiple times for branding
+
+Please mark any changes needed and return this document for implementation.
